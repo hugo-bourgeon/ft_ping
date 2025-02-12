@@ -6,7 +6,7 @@
 #    By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/24 14:34:48 by hubourge          #+#    #+#              #
-#    Updated: 2025/02/12 01:07:01 by hubourge         ###   ########.fr        #
+#    Updated: 2025/02/12 19:34:41 by hubourge         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,9 @@ LIBFT		= $(LIBFT_DIR)/libft.a
 OBJ_DIR		= obj
 
 SRC			=	srcs/main.c \
+				srcs/ping.c \
 				srcs/utils.c \
+				srcs/parsing.c \
 				
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
