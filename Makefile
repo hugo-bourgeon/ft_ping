@@ -6,7 +6,7 @@
 #    By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/24 14:34:48 by hubourge          #+#    #+#              #
-#    Updated: 2025/02/11 21:41:27 by hubourge         ###   ########.fr        #
+#    Updated: 2025/02/12 01:07:01 by hubourge         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,8 @@ LIBFT		= $(LIBFT_DIR)/libft.a
 
 OBJ_DIR		= obj
 
-SRC			= srcs/main.c \
+SRC			=	srcs/main.c \
+				srcs/utils.c \
 				
 OBJ			= $(addprefix $(OBJ_DIR)/, $(SRC:.c=.o))
 
@@ -32,16 +33,16 @@ BIBlue		=\033[1;94m
 NC			=\033[0m
 
 all: $(LIBFT) $(OBJ) 
-	@ echo "$(YELLOW)Compiling ft_nm...$(NC)"
+	@ echo "$(YELLOW)Compiling ft_ping...$(NC)"
 	@ $(CXX) $(CFLAGS) ${INCLUDE} -o $(NAME) $(OBJ) -L $(LIBFT_DIR) -lft
 	@ echo "$(BIBlue)"
-	@ echo "   __ _                       "
-	@ echo "  / _| |_     _ __  _ __ ___  "
-	@ echo " | |_| __|   | '_ \| '_ \` _ \ "
-	@ echo " |  _| |_    | | | | | | | | |"
-	@ echo " |_|  \__|___|_| |_|_| |_| |_|"
-	@ echo "        |_____|               "
-	@ echo "                   by hubourge"
+	@ echo "   __ _              _             "
+	@ echo "  / _| |_      _ __ (_)_ __   __ _ "
+	@ echo " | |_| __|    | '_ \| | '_ \ / _\` |"
+	@ echo " |  _| |_     | |_) | | | | | (_| |"
+	@ echo " |_|  \__|____| .__/|_|_| |_|\__, |"
+	@ echo "        |_____|_|            |___/ "
+	@ echo "                        by hubourge"
 	@ echo "$(NC)"
 
 bonus: all
