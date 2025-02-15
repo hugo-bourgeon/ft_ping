@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/12 20:38:50 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/15 17:06:22 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,11 @@
 # include <arpa/inet.h>
 # include <sys/time.h>
 # include <netdb.h>
+# include <signal.h>
 
 # define PACKET_SIZE 64
+# define PROCESS 0
+# define STOP 1
 
 // struct icmphdr
 // {
@@ -48,6 +51,8 @@
 //   } un;
 // };
 
+extern int g_stop_code;
+
 typedef struct s_ping
 {
 	char				*host;
@@ -61,9 +66,12 @@ typedef struct s_ping
 	socklen_t			addr_len;
 	char				recv_buffer[PACKET_SIZE];
 	size_t				nb_sequence;
+	size_t				nb_received;
+	int					print_stats;
 	struct timeval		time_last;
 	struct timeval		time_now;
 }	t_ping;
+
 
 // ping.c
 void			process(t_ping *ping);
@@ -76,9 +84,11 @@ void			parsing(int ac, char **av, t_ping *ping);
 
 // utils.c
 void			error(int code, t_ping *ping);
+void			handle_sigint(int sig);
 unsigned short	checksum(void *b, int len);
-void			create_imcp_packet(t_ping *ping);
+void			init_imcp_packet(t_ping *ping);
 void			init_socket_dest(t_ping *ping);
-
+void			print_stats(t_ping *ping);
+void		check_sigint(t_ping *ping);
 
 #endif

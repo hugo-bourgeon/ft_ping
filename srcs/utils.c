@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 00:12:42 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/12 20:36:58 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/15 17:18:11 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,28 @@ void	error(int code, t_ping *ping)
 {
 	if (ping->socketfd > 0)
 		close(ping->socketfd);
-	exit(code);
+	if (ping->print_stats)
+	{
+		ping->print_stats = 0;
+		print_stats(ping);
+	}
+	if (code != -1)
+		exit(code);
+}
+
+void	handle_sigint(int sig)
+{
+    (void)sig;
+    g_stop_code = STOP;
+}
+
+void	check_sigint(t_ping *ping)
+{
+	if (g_stop_code == STOP)
+	{
+		ping->print_stats = 1;
+		error(-1, ping);
+	}
 }
 
 unsigned short	checksum(void *packet, int len)
@@ -59,7 +80,7 @@ void	init_socket_dest(t_ping *ping)
     ping->dest_addr.sin_addr.s_addr	= inet_addr(ping->ip);
 }
 
-void	create_imcp_packet(t_ping *ping)
+void	init_imcp_packet(t_ping *ping)
 {
 	// ICMP packet
 	ping->dest_icmp = (struct icmphdr *)ping->packet;	
@@ -71,4 +92,19 @@ void	create_imcp_packet(t_ping *ping)
     ping->dest_icmp->un.echo.sequence	= 1;
 	
 	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
+}
+
+// --- google.com ping statistics ---
+// 3 packets transmitted, 3 packets received, 0.0% packet loss
+// round-trip min/avg/max/stddev = 10.829/12.891/15.009/1.707 ms
+
+void	print_stats(t_ping *ping)
+{
+	ping->print_stats = 0;
+	printf("\n--- %s ping statistics ---\n", ping->host);
+	
+	printf("%zu packets transmitted, %zu packets received, %.1f%% packet loss\n", \
+	ping->nb_sequence, ping->nb_received, (double)(ping->nb_sequence - ping->nb_received) / ping->nb_sequence * 100);
+	
+	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", 0.0, 0.0, 0.0, 0.0);
 }

@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 17:52:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/12 20:42:16 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/02/15 15:38:39 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ void	init_struct(t_ping *ping)
 	ping->host			= NULL;
 	ping->socketfd		= -1;
 	ping->nb_sequence	= 0;
+	ping->nb_received	= 0;
+	ping->print_stats	= 0;
 	memset(&ping->time_now, 0, sizeof(struct timeval));
 	memset(&ping->time_last, 0, sizeof(struct timeval));
 }
