@@ -67,11 +67,26 @@ void	handle_receive(t_ping *ping)
 					(ping->time_now.tv_usec - ping->time_last.tv_usec) / 1000.0;
 
 		printf("%d bytes from %s: icmp_seq=%zu ttl=%d time=%.3f ms\n", \
-		PACKET_SIZE, ping->ip, ping->nb_sequence, ntohs(ping->recv_icmp->un.echo.sequence), rtt);
-		ping->nb_received++;
+		PACKET_SIZE, ping->ip, ping->stats->nb_sent, ntohs(ping->recv_icmp->un.echo.sequence), rtt);
+		
+		handle_stats(ping, rtt);
+		ping->stats->nb_received++;
 	}
 	else
+	{
         printf("Paquet ICMP reçu mais non valide (type=%d, code=%d)\n", ping->recv_icmp->type, ping->recv_icmp->code); ///////////// REVOIR ERREUR
+		ping->stats->nb_lost++; // Est ce que c'est vraiment un packet lost ?
+	}
 	
-	ping->nb_sequence++;
+	ping->stats->nb_sent++;
+}
+
+void	handle_stats(t_ping *ping, double rtt)
+{
+	if (rtt < ping->stats->min)
+		ping->stats->min = rtt;
+	if (rtt > ping->stats->max)
+		ping->stats->max = rtt;
+	ping->stats->avg += rtt;
+	ping->stats->mdev += rtt * rtt;
 }

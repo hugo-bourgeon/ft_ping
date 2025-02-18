@@ -20,11 +20,13 @@ INCLUDE		= -I includes
 
 LIBFT_DIR	= ./libft
 LIBFT		= $(LIBFT_DIR)/libft.a
+LIB			= -lm
 
 OBJ_DIR		= obj
 
 SRC			=	srcs/main.c \
 				srcs/ping.c \
+				srcs/init.c \
 				srcs/utils.c \
 				srcs/parsing.c \
 				
@@ -36,7 +38,7 @@ NC			=\033[0m
 
 all: $(LIBFT) $(OBJ) 
 	@ echo "$(YELLOW)Compiling ft_ping...$(NC)"
-	@ $(CXX) $(CFLAGS) ${INCLUDE} -o $(NAME) $(OBJ) -L $(LIBFT_DIR) -lft
+	@ $(CXX) $(CFLAGS) ${INCLUDE} -o $(NAME) $(OBJ) -L $(LIBFT_DIR) -lft $(LIB)
 	@ echo "$(BIBlue)"
 	@ echo "   __ _              _             "
 	@ echo "  / _| |_      _ __ (_)_ __   __ _ "

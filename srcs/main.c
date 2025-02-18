@@ -16,15 +16,22 @@ int g_stop_code = PROCESS;
 
 int	main(int ac, char **av)
 {
-	t_ping	ping;
+	t_ping	*ping = NULL;
+
+	ping = malloc(sizeof(t_ping));
+	if (!ping)
+	{
+		perror("malloc");
+		error(EXIT_FAILURE, ping);
+	}
+
+	init_struct(ping);
+	parsing(ac, av, ping);
+	init_socket_dest(ping);
+	init_imcp_packet(ping);
+	process(ping);
 	
-	init_struct(&ping);
-	parsing(ac, av, &ping);
-	init_socket_dest(&ping);
-	init_imcp_packet(&ping);
-	process(&ping);
-	
-	if(ping.socketfd > 0)
-		close(ping.socketfd);
+	if(ping->socketfd > 0)
+		close(ping->socketfd);
 	return (0);
 }

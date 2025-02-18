@@ -25,33 +25,25 @@
 # include <sys/time.h>
 # include <netdb.h>
 # include <signal.h>
+# include <math.h>
 
 # define PACKET_SIZE 64
 # define PROCESS 0
 # define STOP 1
 
-// struct icmphdr
-// {
-//   u_int8_t type;                /* message type */
-//   u_int8_t code;                /* type sub-code */
-//   u_int16_t checksum;
-//   union
-//   {
-//     struct
-//     {
-//       u_int16_t        id;
-//       u_int16_t        sequence;
-//     } echo;                        /* echo datagram */
-//     u_int32_t        gateway;        /* gateway address */
-//     struct
-//     {
-//       u_int16_t        __unused;
-//       u_int16_t        mtu;
-//     } frag;                        /* path mtu discovery */
-//   } un;
-// };
-
 extern int g_stop_code;
+
+typedef struct s_stats
+{
+	int					print;
+	size_t				nb_sent;
+	size_t				nb_received;
+	size_t				nb_lost;
+	double				min;
+	double				max;
+	double				avg;
+	double				mdev;
+}	t_stats;
 
 typedef struct s_ping
 {
@@ -65,18 +57,16 @@ typedef struct s_ping
 	struct	icmphdr		*recv_icmp;
 	socklen_t			addr_len;
 	char				recv_buffer[PACKET_SIZE];
-	size_t				nb_sequence;
-	size_t				nb_received;
-	int					print_stats;
 	struct timeval		time_last;
 	struct timeval		time_now;
+	t_stats				*stats;
 }	t_ping;
-
 
 // ping.c
 void			process(t_ping *ping);
 void			handle_send(t_ping *ping);
 void			handle_receive(t_ping *ping);
+void			handle_stats(t_ping *ping, double rtt);
 
 // parsing.c
 void			init_struct(t_ping *ping);
@@ -89,6 +79,6 @@ unsigned short	checksum(void *b, int len);
 void			init_imcp_packet(t_ping *ping);
 void			init_socket_dest(t_ping *ping);
 void			print_stats(t_ping *ping);
-void		check_sigint(t_ping *ping);
+void			check_sigint(t_ping *ping);
 
 #endif

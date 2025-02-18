@@ -12,18 +12,6 @@
 
 #include "ft_ping.h"
 
-void	init_struct(t_ping *ping)
-{
-	ping->ip			= NULL;
-	ping->host			= NULL;
-	ping->socketfd		= -1;
-	ping->nb_sequence	= 0;
-	ping->nb_received	= 0;
-	ping->print_stats	= 0;
-	memset(&ping->time_now, 0, sizeof(struct timeval));
-	memset(&ping->time_last, 0, sizeof(struct timeval));
-}
-
 void	parsing(int ac, char **av, t_ping *ping)
 {
 	if (ac < 2)

@@ -16,13 +16,19 @@ void	error(int code, t_ping *ping)
 {
 	if (ping->socketfd > 0)
 		close(ping->socketfd);
-	if (ping->print_stats)
+	if (ping->stats->print)
 	{
-		ping->print_stats = 0;
+		ping->stats->print = 0;
 		print_stats(ping);
 	}
 	if (code != -1)
+	{
+		if (ping->stats)
+			free(ping->stats);
+		if (ping)
+			free(ping);
 		exit(code);
+	}
 }
 
 void	handle_sigint(int sig)
@@ -35,7 +41,7 @@ void	check_sigint(t_ping *ping)
 {
 	if (g_stop_code == STOP)
 	{
-		ping->print_stats = 1;
+		ping->stats->print = 1;
 		error(-1, ping);
 	}
 }
@@ -64,47 +70,18 @@ unsigned short	checksum(void *packet, int len)
 	return (result);
 }
 
-void	init_socket_dest(t_ping *ping)
-{
-	// Create a raw socket
-	if ((ping->socketfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0)
-	{
-		perror("socket");
-		error(EXIT_FAILURE, ping);
-	}
-
-	// Fill in the destination information
-    memset(&ping->dest_addr, 0, sizeof(ping->dest_addr));
-    ping->dest_addr.sin_family		= AF_INET;
-	ping->dest_addr.sin_port		= 0;
-    ping->dest_addr.sin_addr.s_addr	= inet_addr(ping->ip);
-}
-
-void	init_imcp_packet(t_ping *ping)
-{
-	// ICMP packet
-	ping->dest_icmp = (struct icmphdr *)ping->packet;	
-	memset(ping->packet, 0, PACKET_SIZE);
-    ping->dest_icmp->type				= ICMP_ECHO;
-    ping->dest_icmp->code				= 0;
-    ping->dest_icmp->checksum			= 0;
-    ping->dest_icmp->un.echo.id			= getpid();
-    ping->dest_icmp->un.echo.sequence	= 1;
-	
-	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
-}
-
-// --- google.com ping statistics ---
-// 3 packets transmitted, 3 packets received, 0.0% packet loss
-// round-trip min/avg/max/stddev = 10.829/12.891/15.009/1.707 ms
-
 void	print_stats(t_ping *ping)
 {
-	ping->print_stats = 0;
-	printf("\n--- %s ping statistics ---\n", ping->host);
+	ping->stats->print = 0;
+	printf("--- %s ping statistics ---\n", ping->host);
 	
-	printf("%zu packets transmitted, %zu packets received, %.1f%% packet loss\n", \
-	ping->nb_sequence, ping->nb_received, (double)(ping->nb_sequence - ping->nb_received) / ping->nb_sequence * 100);
+	printf("%zu packets transmitted, %zu packets received, %.0f%% packet loss\n", \
+	ping->stats->nb_sent, ping->stats->nb_received, (double)(ping->stats->nb_sent - ping->stats->nb_received) / ping->stats->nb_sent * 100);
 	
-	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", 0.0, 0.0, 0.0, 0.0);
+
+	double avg = ping->stats->avg / ping->stats->nb_received;
+	double mdev = sqrt((ping->stats->mdev / ping->stats->nb_received) - (avg * avg));
+	
+	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", \
+	ping->stats->min, avg, ping->stats->max, mdev);
 }
