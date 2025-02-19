@@ -14,7 +14,7 @@
 
 void	process(t_ping *ping)
 {
-	// struct timeval timeout;
+	struct timeval timeout;
 	signal(SIGINT, handle_sigint);
 	printf("PING %s (%s): %d data bytes\n", ping->host, ping->ip, PACKET_SIZE);
 
@@ -25,12 +25,11 @@ void	process(t_ping *ping)
 		handle_send(ping);
 		handle_receive(ping);
 
-		usleep(1000000);
-		// timeout.tv_sec = 1;
-		// timeout.tv_usec = 0;
-		// int ret = select(0, NULL, NULL, NULL, &timeout);
-		// if (ret < 0)
-		// 	g_stop_code = STOP;
+		timeout.tv_sec = 1;
+		timeout.tv_usec = 0;
+		int ret = select(0, NULL, NULL, NULL, &timeout);
+		if (ret < 0)
+			g_stop_code = STOP;
 	}
 }
 
@@ -38,7 +37,10 @@ void	handle_send(t_ping *ping)
 {
 	gettimeofday(&ping->time_last, NULL);
 	
-	// printf("sendto %s\n", ping->ip);
+	// Update ICMP sequence number
+	ping->dest_icmp->un.echo.sequence++;
+	ping->dest_icmp->checksum = 0;
+	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
 	if (sendto(ping->socketfd, ping->packet, PACKET_SIZE, 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) < 0)
 	{
         perror("sendto");
@@ -60,8 +62,8 @@ void	handle_receive(t_ping *ping)
 	gettimeofday(&ping->time_now, NULL);
 	
 	// Extract ICMP
-    ping->recv_icmp = (struct icmphdr *)(ping->recv_buffer + 20); // +20 ignore IP header
-    if (ping->recv_icmp->type == ICMP_ECHOREPLY && ping->recv_icmp->code == 0)
+	ping->recv_icmp = (struct icmphdr *)(ping->recv_buffer + 20); // +20 ignore IP header
+	if (ping->recv_icmp->type == ICMP_ECHOREPLY && ping->recv_icmp->code == 0)
 	{
 		double rtt = (ping->time_now.tv_sec - ping->time_last.tv_sec) * 1000.0 + 
 					(ping->time_now.tv_usec - ping->time_last.tv_usec) / 1000.0;

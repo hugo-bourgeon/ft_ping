@@ -58,7 +58,7 @@ void	init_imcp_packet(t_ping *ping)
 	ping->dest_icmp->code				= 0;
 	ping->dest_icmp->checksum			= 0;
 	ping->dest_icmp->un.echo.id			= getpid();
-	ping->dest_icmp->un.echo.sequence	= 1;
+	ping->dest_icmp->un.echo.sequence	= 0;
 
 	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
 }
