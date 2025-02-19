@@ -23,6 +23,7 @@ void	init_struct(t_ping *ping)
 	ping->stats = malloc(sizeof(t_stats));
 	if (!ping->stats)
 		error(EXIT_FAILURE, ping);
+	ping->stats->print = 0;
 	ping->stats->min = 999999;
 	ping->stats->max = 0;
 	ping->stats->avg = 0;

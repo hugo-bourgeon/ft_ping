@@ -18,17 +18,13 @@ void	error(int code, t_ping *ping)
 		close(ping->socketfd);
 	if (ping->stats->print)
 	{
-		ping->stats->print = 0;
 		print_stats(ping);
 	}
-	if (code != -1)
-	{
-		if (ping->stats)
-			free(ping->stats);
-		if (ping)
-			free(ping);
-		exit(code);
-	}
+	if (ping->stats)
+		free(ping->stats);
+	if (ping)
+		free(ping);
+	exit(code);
 }
 
 void	handle_sigint(int sig)
@@ -42,7 +38,8 @@ void	check_sigint(t_ping *ping)
 	if (g_stop_code == STOP)
 	{
 		ping->stats->print = 1;
-		error(-1, ping);
+		// printf("DEBUG : STOP\n");
+		error(EXIT_SUCCESS, ping);
 	}
 }
 
@@ -72,7 +69,6 @@ unsigned short	checksum(void *packet, int len)
 
 void	print_stats(t_ping *ping)
 {
-	ping->stats->print = 0;
 	printf("--- %s ping statistics ---\n", ping->host);
 	
 	printf("%zu packets transmitted, %zu packets received, %.0f%% packet loss\n", \
