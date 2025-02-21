@@ -31,7 +31,6 @@ int	main(int ac, char **av)
 	init_imcp_packet(ping);
 	process(ping);
 	
-	if(ping->socketfd > 0)
-		close(ping->socketfd);
+	error(-1, ping);
 	return (0);
 }

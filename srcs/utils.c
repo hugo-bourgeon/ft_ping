@@ -17,14 +17,17 @@ void	error(int code, t_ping *ping)
 	if (ping->socketfd > 0)
 		close(ping->socketfd);
 	if (ping->stats->print)
-	{
 		print_stats(ping);
-	}
+	if (ping->ip)
+		free(ping->ip);
+	if (ping->host)
+		free(ping->host);
 	if (ping->stats)
 		free(ping->stats);
 	if (ping)
 		free(ping);
-	exit(code);
+	if (code == EXIT_FAILURE || code == EXIT_SUCCESS)
+		exit(code);
 }
 
 void	handle_sigint(int sig)
@@ -38,7 +41,6 @@ void	check_sigint(t_ping *ping)
 	if (g_stop_code == STOP)
 	{
 		ping->stats->print = 1;
-		// printf("DEBUG : STOP\n");
 		error(EXIT_SUCCESS, ping);
 	}
 }
