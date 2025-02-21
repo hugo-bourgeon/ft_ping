@@ -1,0 +1,18 @@
+{
+	dbus_supp
+	Memcheck:Leak
+	match-leak-kinds: reachable
+    fun:calloc
+	...
+	fun:_dl_catch_error
+	...
+}
+{
+	dbus_supp2
+	Memcheck:Leak
+	match-leak-kinds: reachable
+    fun:malloc
+	...
+	fun:_dl_catch_error
+	...
+}
