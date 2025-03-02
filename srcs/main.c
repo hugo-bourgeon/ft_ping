@@ -28,7 +28,7 @@ int	main(int ac, char **av)
 	init_struct(ping);
 	parsing(ac, av, ping);
 	init_socket_dest(ping);
-	init_imcp_packet(ping);
+	init_icmp_packet(ping);
 	process(ping);
 	
 	error(-1, ping);

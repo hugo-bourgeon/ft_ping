@@ -49,7 +49,7 @@ void	init_socket_dest(t_ping *ping)
 	ping->dest_addr.sin_addr.s_addr	= inet_addr(ping->ip);
 }
 
-void	init_imcp_packet(t_ping *ping)
+void	init_icmp_packet(t_ping *ping)
 {
 	// ICMP packet
 	ping->dest_icmp = (struct icmphdr *)ping->packet;	
