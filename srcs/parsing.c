@@ -30,8 +30,7 @@ void	parsing(int ac, char **av, t_ping *ping)
 	status = getaddrinfo(av[1], NULL, &hints, &res);
 	if (status)
 	{
-		ft_printf(STDERR_FILENO, "ping: cannot resolve %s: %s\n", av[1], gai_strerror(status));
-		freeaddrinfo(res);
+		ft_printf(STDERR_FILENO, "ping: unknow host\n");
 		error(EXIT_FAILURE, ping);
 	}
 
