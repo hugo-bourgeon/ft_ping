@@ -24,10 +24,12 @@
 # include <arpa/inet.h>
 # include <sys/time.h>
 # include <netdb.h>
+# include <errno.h>
 # include <signal.h>
 # include <math.h>
 
 # define PACKET_SIZE 64
+# define RECV_BUFFER_SIZE 128
 # define PROCESS 0
 # define STOP 1
 
@@ -56,7 +58,7 @@ typedef struct s_ping
 	struct	icmphdr		*dest_icmp;
 	struct	icmphdr		*recv_icmp;
 	socklen_t			addr_len;
-	char				recv_buffer[PACKET_SIZE];
+	char				recv_buffer[RECV_BUFFER_SIZE];
 	struct timeval		time_last;
 	struct timeval		time_now;
 	t_stats				*stats;
@@ -76,7 +78,7 @@ void			parsing(int ac, char **av, t_ping *ping);
 void			error(int code, t_ping *ping);
 void			handle_sigint(int sig);
 unsigned short	checksum(void *b, int len);
-void			init_imcp_packet(t_ping *ping);
+void			init_icmp_packet(t_ping *ping);
 void			init_socket_dest(t_ping *ping);
 void			print_stats(t_ping *ping);
 void			check_sigint(t_ping *ping);

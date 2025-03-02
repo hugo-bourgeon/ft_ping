@@ -80,6 +80,7 @@ void	print_stats(t_ping *ping)
 	double avg = ping->stats->avg / ping->stats->nb_received;
 	double mdev = sqrt((ping->stats->mdev / ping->stats->nb_received) - (avg * avg));
 	
-	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", \
-	ping->stats->min, avg, ping->stats->max, mdev);
+	if (ping->stats->nb_received)
+		printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", \
+		ping->stats->min, avg, ping->stats->max, mdev);
 }
