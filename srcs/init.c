@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 17:52:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/15 15:38:39 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:41:33 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,21 @@ void	init_struct(t_ping *ping)
 	ping->stats->nb_sent = 0;
 	ping->stats->nb_received = 0;
 	ping->stats->nb_lost = 0;
+
+	ping->flags = malloc(sizeof(t_flags));
+	if (!ping->flags)
+		error(EXIT_FAILURE, ping);
+	ping->flags->v = NOSET;
+	ping->flags->f = NOSET;
+	ping->flags->l = NOSET;
+	ping->flags->n = NOSET;
+	ping->flags->w = NOSET;
+	ping->flags->W = NOSET;
+	ping->flags->p = NOSET;
+	ping->flags->r = NOSET;
+	ping->flags->s = NOSET;
+	ping->flags->T = NOSET;
+	ping->flags->ttl = NOSET;
 }
 
 void	init_socket_dest(t_ping *ping)

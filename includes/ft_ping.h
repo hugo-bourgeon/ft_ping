@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/15 17:06:22 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/10 19:42:42 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,16 @@
 # include <errno.h>
 # include <signal.h>
 # include <math.h>
+# include <getopt.h>
 
 # define PACKET_SIZE 64
 # define RECV_BUFFER_SIZE 128
 # define PROCESS 0
 # define STOP 1
+# define NOSET -1
+# define TSONLY 10
+# define TSANDADDR 11
+# define TSPRESPEC 12
 
 extern int g_stop_code;
 
@@ -46,6 +51,21 @@ typedef struct s_stats
 	double				avg;
 	double				mdev;
 }	t_stats;
+
+typedef struct	s_flags
+{
+	int				v;
+	int				f;
+	int				l;
+	int				n;
+	int				w;
+	int				W;
+	int				p;
+	int				r;
+	int				s;
+	int				T;
+	int				ttl;
+}	t_flags;
 
 typedef struct s_ping
 {
@@ -62,6 +82,7 @@ typedef struct s_ping
 	struct timeval		time_last;
 	struct timeval		time_now;
 	t_stats				*stats;
+	t_flags				*flags;
 }	t_ping;
 
 // ping.c
@@ -71,15 +92,18 @@ void			handle_receive(t_ping *ping);
 void			handle_stats(t_ping *ping, double rtt);
 
 // parsing.c
-void			init_struct(t_ping *ping);
 void			parsing(int ac, char **av, t_ping *ping);
+void			setup_ip(char *ip, t_ping *ping);
+
+// init.c
+void			init_struct(t_ping *ping);
+void			init_socket_dest(t_ping *ping);
+void			init_icmp_packet(t_ping *ping);
 
 // utils.c
 void			error(int code, t_ping *ping);
 void			handle_sigint(int sig);
 unsigned short	checksum(void *b, int len);
-void			init_icmp_packet(t_ping *ping);
-void			init_socket_dest(t_ping *ping);
 void			print_stats(t_ping *ping);
 void			check_sigint(t_ping *ping);
 

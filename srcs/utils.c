@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 00:12:42 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/15 17:18:11 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/11 17:44:24 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ void	error(int code, t_ping *ping)
 		free(ping->host);
 	if (ping->stats)
 		free(ping->stats);
+	if (ping->flags)
+		free(ping->flags);
 	if (ping)
 		free(ping);
 	if (code == EXIT_FAILURE || code == EXIT_SUCCESS)
