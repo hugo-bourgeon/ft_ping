@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 13:12:12 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/12 13:20:00 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/12 20:33:17 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	printf_header(t_ping *ping)
 {
 	printf("PING %s (%s): %d data bytes", ping->host, ping->ip, PACKET_SIZE - 8);
-	if (ping->flags->v != NOSET)
+	if (ping->flags->v != NOTSET)
 		printf(", id Ox%x = %d", ping->dest_icmp->un.echo.id, ping->dest_icmp->un.echo.id);
 	printf("\n");
 }

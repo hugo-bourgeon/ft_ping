@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/12 13:20:30 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/12 20:33:17 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@
 # define RECV_BUFFER_SIZE 128
 # define PROCESS 0
 # define STOP 1
-# define NOSET -1
+# define NOTSET -1
 # define TSONLY 10
 # define TSANDADDR 11
 # define TSPRESPEC 12
@@ -56,7 +56,7 @@ typedef struct	s_flags
 {
 	int				v;
 	int				f;
-	int				l;
+	long long		l;
 	int				n;
 	int				w;
 	int				W;

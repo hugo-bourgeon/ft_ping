@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 17:52:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/10 19:41:33 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/12 20:33:17 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,17 +35,17 @@ void	init_struct(t_ping *ping)
 	ping->flags = malloc(sizeof(t_flags));
 	if (!ping->flags)
 		error(EXIT_FAILURE, ping);
-	ping->flags->v = NOSET;
-	ping->flags->f = NOSET;
-	ping->flags->l = NOSET;
-	ping->flags->n = NOSET;
-	ping->flags->w = NOSET;
-	ping->flags->W = NOSET;
-	ping->flags->p = NOSET;
-	ping->flags->r = NOSET;
-	ping->flags->s = NOSET;
-	ping->flags->T = NOSET;
-	ping->flags->ttl = NOSET;
+	ping->flags->v = NOTSET;
+	ping->flags->f = NOTSET;
+	ping->flags->l = NOTSET;
+	ping->flags->n = NOTSET;
+	ping->flags->w = NOTSET;
+	ping->flags->W = NOTSET;
+	ping->flags->p = NOTSET;
+	ping->flags->r = NOTSET;
+	ping->flags->s = NOTSET;
+	ping->flags->T = NOTSET;
+	ping->flags->ttl = NOTSET;
 }
 
 void	init_socket_dest(t_ping *ping)

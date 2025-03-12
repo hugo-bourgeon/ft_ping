@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 19:33:55 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/12 13:22:42 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/12 20:39:56 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ void	process(t_ping *ping)
 			ping->stats->nb_lost++;
 		else if (bytes_recv < 0)	// Ctrl+C
 			g_stop_code = STOP;
-		
-		if (ping->flags->f != NOSET)
+
+		if (ping->flags->f != NOTSET || ping->flags->l != NOTSET)
 			timeout.tv_sec = 0;
 		// Wait 1 second complement
 		bytes_recv = select(0, NULL, NULL, NULL, &timeout);
@@ -63,18 +63,18 @@ void	handle_send(t_ping *ping)
 		perror("sendto");
 		error(EXIT_FAILURE, ping);
 	}
+	if (ping->flags->l != NOTSET)
+		ping->flags->l--;
 	ping->stats->nb_sent++;
 }
 
 void	handle_receive(t_ping *ping)
 {
 	ping->addr_len = sizeof(ping->recv_addr);
-	
+
 	int bytes_received;
-	if (ping->flags->f)
-	{
+	if (ping->flags->f != NOTSET || ping->flags->l == NOTSET)
 		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, PACKET_SIZE, 0, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
-	}
 	else
 		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, PACKET_SIZE, MSG_DONTWAIT, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
 	gettimeofday(&ping->time_now, NULL);
@@ -95,7 +95,7 @@ void	handle_receive(t_ping *ping)
 		double	rtt	= (ping->time_now.tv_sec - ping->time_last.tv_sec) * 1000.0 + 
 					(ping->time_now.tv_usec - ping->time_last.tv_usec) / 1000.0;
 
-		if (ping->flags->f == NOSET)
+		if (ping->flags->f == NOTSET)
 			printf("%d bytes from %s: icmp_seq=%u ttl=%d time=%.3f ms\n", \
 		bytes_received, ping->ip, ping->dest_icmp->un.echo.sequence - 1, ttl, rtt);
 		
