@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 19:33:55 by hubourge          #+#    #+#             */
-/*   Updated: 2025/02/15 17:32:17 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/12 11:55:23 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,10 @@ void	process(t_ping *ping)
 {
 	struct timeval timeout;
 	signal(SIGINT, handle_sigint);
-	printf("PING %s (%s): %d data bytes\n", ping->host, ping->ip, PACKET_SIZE - 8);
+	printf("PING %s (%s): %d data bytes", ping->host, ping->ip, PACKET_SIZE - 8);
+	if (ping->flags->v)
+		printf(", id Ox%x = %d", ping->dest_icmp->un.echo.id, ping->dest_icmp->un.echo.id);
+	printf("\n");
 
 	while (1)
 	{

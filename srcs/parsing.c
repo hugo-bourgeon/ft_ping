@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 17:52:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/10 20:35:25 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/12 11:56:13 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,7 @@ void	parsing(int ac, char **av, t_ping *ping)
     };
     
     while ((opt = getopt_long(ac, av, "vrnf :l:w:W:p:s:T:", long_options, NULL)) != -1)
-    {
-        printf("opt: %c\n", opt);
-        printf("optarg: %s\n", optarg);
-       
+    {       
         switch (opt)
         {
             case 'v': ping->flags->v = 1; break;
