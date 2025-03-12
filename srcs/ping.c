@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 19:33:55 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/12 11:55:23 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/12 13:22:42 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 void	process(t_ping *ping)
 {
-	struct timeval timeout;
+	struct timeval	timeout;
+	fd_set			read_fds;
+	int				bytes_recv;
+
 	signal(SIGINT, handle_sigint);
-	printf("PING %s (%s): %d data bytes", ping->host, ping->ip, PACKET_SIZE - 8);
-	if (ping->flags->v)
-		printf(", id Ox%x = %d", ping->dest_icmp->un.echo.id, ping->dest_icmp->un.echo.id);
-	printf("\n");
+	printf_header(ping);
 
 	while (1)
 	{
@@ -27,24 +27,26 @@ void	process(t_ping *ping)
 		handle_send(ping);
 
 		// Wait ICMP reply
-		fd_set	read_fds;
 		FD_ZERO(&read_fds);
 		FD_SET(ping->socketfd, &read_fds);
-		timeout.tv_sec	= 1; // Timeout 1 second
+		timeout.tv_sec	= 1;
 		timeout.tv_usec	= 0;
 		
-		int ret = select(ping->socketfd + 1, &read_fds, NULL, NULL, &timeout);
-		if (ret > 0)		// Packet received
+		// Wait for packet
+		bytes_recv = select(ping->socketfd + 1, &read_fds, NULL, NULL, &timeout);
+		if (bytes_recv > 0)		// Packet received
 			handle_receive(ping);
-		else if (ret == 0)	// Packet Timeout
+		else if (bytes_recv == 0)	// Packet Timeout
 			ping->stats->nb_lost++;
-		else if (ret < 0)	// Ctrl+C
+		else if (bytes_recv < 0)	// Ctrl+C
 			g_stop_code = STOP;
 		
-		// Wait 1 second if necessary
-		ret = select(0, NULL, NULL, NULL, &timeout);
+		if (ping->flags->f != NOSET)
+			timeout.tv_sec = 0;
+		// Wait 1 second complement
+		bytes_recv = select(0, NULL, NULL, NULL, &timeout);
 		check_sigint(ping);
-		if (ret < 0)		// Ctrl+C
+		if (bytes_recv < 0)		// Ctrl+C
 			g_stop_code = STOP;
 	}
 }
@@ -67,8 +69,14 @@ void	handle_send(t_ping *ping)
 void	handle_receive(t_ping *ping)
 {
 	ping->addr_len = sizeof(ping->recv_addr);
-
-	int bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, PACKET_SIZE, MSG_DONTWAIT, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
+	
+	int bytes_received;
+	if (ping->flags->f)
+	{
+		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, PACKET_SIZE, 0, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
+	}
+	else
+		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, PACKET_SIZE, MSG_DONTWAIT, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
 	gettimeofday(&ping->time_now, NULL);
 	if (bytes_received < 0)
 	{
@@ -87,7 +95,8 @@ void	handle_receive(t_ping *ping)
 		double	rtt	= (ping->time_now.tv_sec - ping->time_last.tv_sec) * 1000.0 + 
 					(ping->time_now.tv_usec - ping->time_last.tv_usec) / 1000.0;
 
-		printf("%d bytes from %s: icmp_seq=%u ttl=%d time=%.3f ms\n", \
+		if (ping->flags->f == NOSET)
+			printf("%d bytes from %s: icmp_seq=%u ttl=%d time=%.3f ms\n", \
 		bytes_received, ping->ip, ping->dest_icmp->un.echo.sequence - 1, ttl, rtt);
 		
 		handle_stats(ping, rtt);
@@ -98,7 +107,6 @@ void	handle_receive(t_ping *ping)
 		printf("%d bytes from %s (%s): Destination Host Unreachable\n", bytes_received, ping->host, inet_ntoa(ping->recv_addr.sin_addr));
 		ping->stats->nb_lost++;
 	}
-	
 }
 
 void	handle_stats(t_ping *ping, double rtt)

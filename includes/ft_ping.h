@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/10 19:42:42 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/12 13:20:30 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,11 @@ void			init_icmp_packet(t_ping *ping);
 void			error(int code, t_ping *ping);
 void			handle_sigint(int sig);
 unsigned short	checksum(void *b, int len);
-void			print_stats(t_ping *ping);
 void			check_sigint(t_ping *ping);
+
+// print.c
+void			printf_header(t_ping *ping);
+void			print_stats(t_ping *ping);
+
 
 #endif
