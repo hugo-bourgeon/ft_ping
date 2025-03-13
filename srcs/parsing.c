@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 17:52:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/12 20:32:55 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/13 21:28:30 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,106 +20,156 @@ void	parsing(int ac, char **av, t_ping *ping)
 		error(EXIT_FAILURE, ping);
 	}
 
-	int opt;
-    static struct option long_options[] = 
-    {
-        {"ttl", required_argument,  0,  1},
-        {0,     0,                  0,  0}
-    };
-    
-    while ((opt = getopt_long(ac, av, "vrnf :l:w:W:p:s:T:", long_options, NULL)) != -1)
-    {       
-        switch (opt)
-        {
-            case 'v': ping->flags->v = 1; break;
-            case 'f': ping->flags->f = 1; break;
-            case 'n': ping->flags->n = 1; break;
-            case 'r': ping->flags->r = 1; break;
+	int						opt;
+	static struct option	long_options[] = 
+	{
+		{"ttl",	required_argument,	0,	1},
+		{0,		0,					0,	0}
+	};
+	
+	while ((opt = getopt_long(ac, av, "vrnf :l:w:W:p:s:T:", long_options, NULL)) != -1)
+	{
+		switch (opt)
+		{
+			case 'v': ping->flags->v = 1; break;
+			case 'f': ping->flags->f = 1; break;
+			case 'n': ping->flags->n = 1; break;
+			case 'r': ping->flags->r = 1; break;
 
-            case 'l':
-                if (!optarg) { fprintf(stderr, "ping: option requires an argument -- 'l'\n"); error(EXIT_FAILURE, ping); }
-                 
-                for (int i = 0; optarg[i]; i++)
-                {
-                    if (optarg[i] < '0' || optarg[i] > '9')
-                    {
-                        fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
-                        error(EXIT_FAILURE, ping);
-                    }
-                }
-                if (strlen(optarg) > strlen("2147483647")) 
-                {
-                    fprintf(stderr, "ping: invalid preload value (%s)\n", optarg); 
-                    error(EXIT_FAILURE, ping);
-                }
+			case 'l':
+				if (!optarg) { fprintf(stderr, "ping: option requires an argument -- 'l'\n"); error(EXIT_FAILURE, ping); }
+				 
+				for (int i = 0; optarg[i]; i++)
+				{
+					if (optarg[i] < '0' || optarg[i] > '9')
+					{
+						fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+						error(EXIT_FAILURE, ping);
+					}
+				}
+				if (strlen(optarg) > strlen("2147483647")) 
+				{
+					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg); 
+					error(EXIT_FAILURE, ping);
+				}
 
-                ping->flags->l = atoll(optarg);
-                if (ping->flags->l < 0 || ping->flags->l > 2147483647)
-                {
-                    fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
-                    error(EXIT_FAILURE, ping);
-                }
-                break;
+				ping->flags->l = atoll(optarg);
+				if (ping->flags->l < 0 || ping->flags->l > 2147483647)
+				{
+					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+					error(EXIT_FAILURE, ping);
+				}
+				break;
 
-            case 'w': 
-                if (!optarg) { fprintf(stderr, "Error: -w requires an argument\n"); error(EXIT_FAILURE, ping); }
-                ping->flags->w = atoi(optarg); 
-                break;
+			case 'w': 
+				if (!optarg) { fprintf(stderr, "ping: option requires an argument -- 'w'\n"); error(EXIT_FAILURE, ping); }
 
-            case 'W': 
-                if (!optarg) { fprintf(stderr, "Error: -W requires an argument\n"); error(EXIT_FAILURE, ping); }
-                ping->flags->W = atoi(optarg); 
-                break;
+				for (int i = 0; optarg[i]; i++)
+				{
+					if (optarg[i] < '0' || optarg[i] > '9')
+					{
+						fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+						error(EXIT_FAILURE, ping);
+					}
+				}
+				if (strlen(optarg) > strlen("2147483647")) 
+				{
+					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg); 
+					error(EXIT_FAILURE, ping);
+				}
 
-            case 'p': 
-                if (!optarg) { fprintf(stderr, "Error: -p requires an argument\n"); error(EXIT_FAILURE, ping); }
-                ping->flags->p = atoi(optarg); 
-                break;
+				ping->flags->w = atoll(optarg); 
+				if (ping->flags->w < 0 || ping->flags->l > 2147483647)
+				{
+					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+					error(EXIT_FAILURE, ping);
+				}
+				if (ping->flags->w == 0)
+				{
+					fprintf(stderr, "ping: option value too small: (%s)\n", optarg);
+					error(EXIT_FAILURE, ping);
+				}
+				break;
 
-            case 's': 
-                if (!optarg) { fprintf(stderr, "Error: -s requires an argument\n"); error(EXIT_FAILURE, ping); }
-                ping->flags->s = atoi(optarg); 
-                break;
+			case 'W': 
+			if (!optarg) { fprintf(stderr, "ping: option requires an argument -- 'W'\n"); error(EXIT_FAILURE, ping); }
 
-            case 'T':
-                if (!optarg) { 
-                    fprintf(stderr, "Error: -T requires an argument (tsonly, tsandaddr, tsprespec)\n"); 
-                    error(EXIT_FAILURE, ping); 
-                }
-                ping->flags->T = 0;  // imcomplet
-                
-                break;
+			for (int i = 0; optarg[i]; i++)
+			{
+				if (optarg[i] < '0' || optarg[i] > '9')
+				{
+					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+					error(EXIT_FAILURE, ping);
+				}
+			}
+			if (strlen(optarg) > strlen("2147483647")) 
+			{
+				fprintf(stderr, "ping: invalid preload value (%s)\n", optarg); 
+				error(EXIT_FAILURE, ping);
+			}
 
-            case 1:  // --ttl <value>
-                if (!optarg) { fprintf(stderr, "Error: --ttl requires an argument\n"); error(EXIT_FAILURE, ping); }
-                ping->flags->ttl = atoi(optarg);
-                if (ping->flags->ttl < 1 || ping->flags->ttl > 255) {
-                    fprintf(stderr, "Error: TTL must be between 1 and 255.\n");
-                    error(EXIT_FAILURE, ping);
-                }
-                break;
+			ping->flags->W = atoll(optarg);
+			if (ping->flags->W < 0 || ping->flags->W > 2147483647)
+			{
+				fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+				error(EXIT_FAILURE, ping);
+			}
+			if (ping->flags->W == 0)
+			{
+				fprintf(stderr, "ping: option value too small: (%s)\n", optarg);
+				error(EXIT_FAILURE, ping);
+			}
+			
+			break;
 
-            case '?':
-                fprintf(stderr, "Try 'ping --help' or 'ping --usage' for more information.\n");
-                // fprintf(stderr, "ping [-vfnr] [-l preload] [-w deadline] [-W timeout] [-p pattern] [-s packetsize] [-T timestamp_option] [--ttl ttl] destination\n");
-                error(EXIT_FAILURE, ping);
-        }
-    }
+			case 'p': 
+				if (!optarg) { fprintf(stderr, "Error: -p requires an argument\n"); error(EXIT_FAILURE, ping); }
+				ping->flags->p = atoi(optarg); 
+				break;
 
-    // printf("optind: %d\n", optind);
-    // printf("ac: %d\n", ac);
-    if (optind >= ac) {
-        fprintf(stderr, "Error: missing host operand\n");
-        error(EXIT_FAILURE, ping);
-    }
+			case 's': 
+				if (!optarg) { fprintf(stderr, "Error: -s requires an argument\n"); error(EXIT_FAILURE, ping); }
+				ping->flags->s = atoi(optarg); 
+				break;
 
-    // printf("av[%d]: %s\n", optind, av[optind]);
+			case 'T':
+				if (!optarg) { 
+					fprintf(stderr, "Error: -T requires an argument (tsonly, tsandaddr, tsprespec)\n"); 
+					error(EXIT_FAILURE, ping); 
+				}
+				ping->flags->T = 0;  // imcomplet
+				break;
+
+			case 1:  // --ttl <value>
+				if (!optarg) { fprintf(stderr, "Error: --ttl requires an argument\n"); error(EXIT_FAILURE, ping); }
+				ping->flags->ttl = atoi(optarg);
+				if (ping->flags->ttl < 1 || ping->flags->ttl > 255) {
+					fprintf(stderr, "Error: TTL must be between 1 and 255.\n");
+					error(EXIT_FAILURE, ping);
+				}
+				break;
+
+			case '?':
+				fprintf(stderr, "Try 'ping --help' or 'ping --usage' for more information.\n");
+				// fprintf(stderr, "ping [-vfnr] [-l preload] [-w deadline] [-W timeout] [-p pattern] [-s packetsize] [-T timestamp_option] [--ttl ttl] destination\n");
+				error(EXIT_FAILURE, ping);
+		}
+	}
+
+	// printf("optind: %d\n", optind);
+	// printf("ac: %d\n", ac);
+	if (optind >= ac) {
+		fprintf(stderr, "Error: missing host operand\n");
+		error(EXIT_FAILURE, ping);
+	}
+
+	// printf("av[%d]: %s\n", optind, av[optind]);
 	setup_ip(av[optind], ping);
 }
 
 void	setup_ip(char *ip, t_ping *ping)
 {
-    // printf("ip: %s\n", ip);
+	// printf("ip: %s\n", ip);
 	struct addrinfo	hints, *res;
 	int				status;
 
@@ -155,4 +205,3 @@ void	setup_ip(char *ip, t_ping *ping)
 
 	freeaddrinfo(res);
 }
-

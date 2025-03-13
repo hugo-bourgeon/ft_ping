@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/12 20:33:17 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/03/13 14:46:38 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,8 @@ typedef struct	s_flags
 	int				f;
 	long long		l;
 	int				n;
-	int				w;
-	int				W;
+	long long		w;
+	long long		W;
 	int				p;
 	int				r;
 	int				s;
@@ -81,6 +81,7 @@ typedef struct s_ping
 	char				recv_buffer[RECV_BUFFER_SIZE];
 	struct timeval		time_last;
 	struct timeval		time_now;
+	struct timeval		time_start;
 	t_stats				*stats;
 	t_flags				*flags;
 }	t_ping;
