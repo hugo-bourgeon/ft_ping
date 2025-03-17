@@ -38,6 +38,10 @@
 # define TSANDADDR 11
 # define TSPRESPEC 12
 
+# define PRINT_OPT(short, long, msg) printf("  %-4s %-21s %s\n", short, long, msg);
+# define PRINT_OPT_S(short, msg)     PRINT_OPT(short, "", msg)
+# define PRINT_OPT_L(long, msg)      PRINT_OPT("", long, msg)
+
 extern int g_stop_code;
 
 typedef struct s_stats
@@ -109,6 +113,6 @@ void			check_sigint(t_ping *ping);
 // print.c
 void			printf_header(t_ping *ping);
 void			print_stats(t_ping *ping);
-
+void			print_help();
 
 #endif

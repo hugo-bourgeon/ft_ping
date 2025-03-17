@@ -35,3 +35,32 @@ void	print_stats(t_ping *ping)
 		printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", \
 		ping->stats->min, avg, ping->stats->max, mdev);
 }
+
+void	print_help()
+{
+	printf("Usage: ft_ping [OPTION...] HOST ...\n");
+	printf("Send ICMP ECHO_REQUEST packets to network hosts.\n");
+	printf("\n Options valid for all request types:\n\n");
+
+	PRINT_OPT_S("-n,", "do not resolve host addresses");
+	PRINT_OPT_S("-r,", "send directly to a host on an attached network");
+	PRINT_OPT_L("--ttl=N", "specify N as time-to-live");
+	PRINT_OPT_S("-T,", "set type of service (TOS) to NUM");
+	PRINT_OPT_S("-v,", "verbose output");
+	PRINT_OPT_S("-w,", "stop after N seconds");
+	PRINT_OPT_S("-W,", "number of seconds to wait for response");
+
+	printf("\n Options valid for --echo requests:\n\n");
+
+	PRINT_OPT_S("-f,", "flood ping (root only)");
+	PRINT_OPT_S("-l,", "send NUMBER packets as fast as possible before");
+	printf("                             falling into normal mode of behavior (root only)\n");
+	PRINT_OPT_S("-p,", "fill ICMP packet with given pattern (hex)");
+	PRINT_OPT_S("-s,", "send NUMBER data octets");
+
+	printf("\n");
+
+	PRINT_OPT("-?,", "--help", "give this help list");
+	PRINT_OPT_L("--usage", "give a short usage message");
+	PRINT_OPT_S("-V,", "print program version");
+}
