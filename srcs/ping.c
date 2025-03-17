@@ -14,38 +14,59 @@
 
 void	process(t_ping *ping)
 {
-	struct timeval	timeout;
+	struct timeval	time_limit, timeout;
 	fd_set			read_fds;
 	int				bytes_recv;
 
 	signal(SIGINT, handle_sigint);
 	printf_header(ping);
-	gettimeofday(&ping->time_start, NULL);
+
+	// Set total timeout
+	if (ping->flags->w != NOTSET)
+	{
+        gettimeofday(&time_limit, NULL);
+        time_limit.tv_sec += ping->flags->w;
+    }
 
 	while (1)
 	{
-		// gettimeofday(&ping->time_now, NULL);
-		// printf("1 ping->timenow - ping->timestart: %.3ld\n", (ping->time_now.tv_sec - ping->time_start.tv_sec) * 1000 + (ping->time_now.tv_usec - ping->time_start.tv_usec) / 1000);
 		
 		check_sigint(ping);
-
-		// gettimeofday(&ping->time_now, NULL);
-		// printf("2 ping->timenow - ping->timestart: %.3ld\n", (ping->time_now.tv_sec - ping->time_start.tv_sec) * 1000 + (ping->time_now.tv_usec - ping->time_start.tv_usec) / 1000);
-		
 		handle_send(ping);
 
-		// gettimeofday(&ping->time_now, NULL);
-		// printf("3 ping->timenow - ping->timestart: %.3ld\n", (ping->time_now.tv_sec - ping->time_start.tv_sec) * 1000 + (ping->time_now.tv_usec - ping->time_start.tv_usec) / 1000);
+		// Check total timeout
+		gettimeofday(&ping->time_now, NULL);
+		if (ping->flags->w != NOTSET && 
+			(ping->time_now.tv_sec > time_limit.tv_sec || 
+			(ping->time_now.tv_sec == time_limit.tv_sec && ping->time_now.tv_usec >= time_limit.tv_usec))) 
+		{
+			g_stop_code = STOP;
+			break;
+		}
 
 		// Wait ICMP reply
 		FD_ZERO(&read_fds);
 		FD_SET(ping->socketfd, &read_fds);
-		timeout.tv_sec	= 1;
+		timeout.tv_sec	= ping->flags->W;
 		timeout.tv_usec	= 0;
+
+		// Check total timeout remaining time
+		if (ping->flags->w != NOTSET)
+		{
+            long remaining_sec = time_limit.tv_sec - ping->time_now.tv_sec;
+            long remaining_usec = time_limit.tv_usec - ping->time_now.tv_usec;
+            if (remaining_usec < 0)
+			{
+                remaining_sec--;
+                remaining_usec += 1000000;
+            }
+            if (remaining_sec < 1)
+			{
+				timeout.tv_sec--;
+				timeout.tv_usec = remaining_usec;
+			}
+		}
 	
-		// gettimeofday(&ping->time_now, NULL);
-		// printf("4 ping->timenow - ping->timestart: %.3ld\n", (ping->time_now.tv_sec - ping->time_start.tv_sec) * 1000 + (ping->time_now.tv_usec - ping->time_start.tv_usec) / 1000);
-		
 		// Wait for packet
 		bytes_recv = select(ping->socketfd + 1, &read_fds, NULL, NULL, &timeout);
 		if (bytes_recv > 0)			// Packet received
@@ -55,17 +76,16 @@ void	process(t_ping *ping)
 		else if (bytes_recv < 0)	// Ctrl+C
 			g_stop_code = STOP;
 
-		// gettimeofday(&ping->time_now, NULL);
-		// printf("5 ping->timenow - ping->timestart: %.3ld\n", (ping->time_now.tv_sec - ping->time_start.tv_sec) * 1000 + (ping->time_now.tv_usec - ping->time_start.tv_usec) / 1000);
-
 		if (ping->flags->f != NOTSET || ping->flags->l != NOTSET)
 			timeout.tv_sec = 0;
 		check_sigint(ping);
+
 		// Wait 1 second complement
 		bytes_recv = select(0, NULL, NULL, NULL, &timeout);
 		if (bytes_recv < 0)		// Ctrl+C
 			g_stop_code = STOP;
 	}
+	check_sigint(ping);
 }
 
 void	handle_send(t_ping *ping)

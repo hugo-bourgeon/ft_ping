@@ -19,7 +19,6 @@ void	init_struct(t_ping *ping)
 	ping->socketfd		= -1;
 	memset(&ping->time_now, 0, sizeof(struct timeval));
 	memset(&ping->time_last, 0, sizeof(struct timeval));
-	memset(&ping->time_start, 0, sizeof(struct timeval));
 
 	ping->stats = malloc(sizeof(t_stats));
 	if (!ping->stats)
@@ -41,7 +40,7 @@ void	init_struct(t_ping *ping)
 	ping->flags->l = NOTSET;
 	ping->flags->n = NOTSET;
 	ping->flags->w = NOTSET;
-	ping->flags->W = NOTSET;
+	ping->flags->W = 1;
 	ping->flags->p = NOTSET;
 	ping->flags->r = NOTSET;
 	ping->flags->s = NOTSET;

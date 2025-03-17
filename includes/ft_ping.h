@@ -81,7 +81,6 @@ typedef struct s_ping
 	char				recv_buffer[RECV_BUFFER_SIZE];
 	struct timeval		time_last;
 	struct timeval		time_now;
-	struct timeval		time_start;
 	t_stats				*stats;
 	t_flags				*flags;
 }	t_ping;
