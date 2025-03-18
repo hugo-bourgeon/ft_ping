@@ -17,6 +17,10 @@ void	init_struct(t_ping *ping)
 	ping->ip			= NULL;
 	ping->host			= NULL;
 	ping->socketfd		= -1;
+	ping->dest_icmp		= NULL;
+	ping->recv_icmp		= NULL;
+	ping->addr_len		= 0;
+
 	memset(&ping->time_now, 0, sizeof(struct timeval));
 	memset(&ping->time_last, 0, sizeof(struct timeval));
 
@@ -41,7 +45,7 @@ void	init_struct(t_ping *ping)
 	ping->flags->n = NOTSET;
 	ping->flags->w = NOTSET;
 	ping->flags->W = 1;
-	ping->flags->p = NOTSET;
+	ping->flags->p = NULL;
 	ping->flags->r = NOTSET;
 	ping->flags->s = NOTSET;
 	ping->flags->T = NOTSET;
@@ -72,8 +76,14 @@ void	init_icmp_packet(t_ping *ping)
 	ping->dest_icmp->type				= ICMP_ECHO;
 	ping->dest_icmp->code				= 0;
 	ping->dest_icmp->checksum			= 0;
+	ping->dest_icmp->checksum 			= checksum(ping->packet, sizeof(ping->packet));
 	ping->dest_icmp->un.echo.id			= getpid();
 	ping->dest_icmp->un.echo.sequence	= 0;
 
-	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
+	// ICMP payload
+	unsigned char	*payload		= ping->packet + sizeof(struct icmphdr) + 16;
+	size_t			payload_size	= PACKET_SIZE - sizeof(struct icmphdr) - 16;
+
+	if (ping->flags->p)
+		fill_pattern(payload, ping->flags->p, payload_size);
 }

@@ -12,7 +12,7 @@
 
 #include "ft_ping.h"
 
-int g_stop_code = PROCESS;
+int		g_stop_code = PROCESS;
 void	print_struct(t_ping * ping);
 
 int	main(int ac, char **av)
@@ -47,7 +47,7 @@ void	print_struct(t_ping * ping)
 	printf("flag n:    %d\n", ping->flags->n);
 	printf("flag w:    %lld\n", ping->flags->w);
 	printf("flag W:    %lld\n", ping->flags->W);
-	printf("flag p:    %d\n", ping->flags->p);
+	printf("flag p:    %s\n", ping->flags->p);
 	printf("flag r:    %d\n", ping->flags->r);
 	printf("flag s:    %d\n", ping->flags->s);
 	printf("flag T:    %d\n", ping->flags->T);

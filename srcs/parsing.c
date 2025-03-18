@@ -120,12 +120,17 @@ void	parsing(int ac, char **av, t_ping *ping)
 					fprintf(stderr, "ping: option value too small: (%s)\n", optarg);
 					error(EXIT_FAILURE, ping);
 				}
-			
 				break;
 
-			case 'p': 
-				if (!optarg) { fprintf(stderr, "Error: -p requires an argument\n"); error(EXIT_FAILURE, ping); }
-				ping->flags->p = atoi(optarg); 
+			case 'p':
+				is_valid_hex_pattern(optarg, ping);
+				ping->flags->p = malloc(strlen(optarg) + 1);
+				if (!ping->flags->p)
+				{
+					perror("malloc");
+					error(EXIT_FAILURE, ping);
+				}
+				strcpy(ping->flags->p, optarg);
 				break;
 
 			case 's': 
@@ -158,8 +163,10 @@ void	parsing(int ac, char **av, t_ping *ping)
 				}
 				else
 				{
-					fprintf(stderr, "./ft_ping: invalid option -- '%c'\n", optopt);
-					fprintf(stderr, "Try './ft_ping --help' or './ft_ping --usage' for more information.\n");
+					if (!optarg)
+						print_requires(optopt);
+					else
+						print_invalid(optopt);
 					error(EXIT_FAILURE, ping);
 				}
 		}

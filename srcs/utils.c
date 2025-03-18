@@ -25,7 +25,11 @@ void	error(int code, t_ping *ping)
 	if (ping->stats)
 		free(ping->stats);
 	if (ping->flags)
+	{
+		if (ping->flags->p)
+			free(ping->flags->p);
 		free(ping->flags);
+	}
 	if (ping)
 		free(ping);
 	if (code == EXIT_FAILURE || code == EXIT_SUCCESS)
@@ -34,8 +38,8 @@ void	error(int code, t_ping *ping)
 
 void	handle_sigint(int sig)
 {
-    (void)sig;
-    g_stop_code = STOP;
+	(void)sig;
+	g_stop_code = STOP;
 }
 
 void	check_sigint(t_ping *ping)
@@ -69,4 +73,56 @@ unsigned short	checksum(void *packet, int len)
 	// one's complement
 	result = ~sum;
 	return (result);
+}
+
+void	is_valid_hex_pattern(char *pattern, t_ping *ping)
+{
+	int len = strlen(pattern);
+
+	for (int i = 0; i < len; i++)
+	{
+		if (!isxdigit(pattern[i]))
+		{
+			fprintf(stderr, "./ft_ping: error in pattern near %s\n", &pattern[i]);
+			error(EXIT_FAILURE, ping);
+		}
+	}
+}
+
+void	fill_pattern(unsigned char *packet, const char *pattern, size_t len)
+{
+	size_t	pattern_len = strlen(pattern);
+	size_t	i = 0, j = 0;
+
+	int is_odd = (pattern_len % 2 != 0);
+
+	// Limit to 32 bytes
+	if (pattern_len > 32)
+		pattern_len = 32;
+
+	while (i < len)
+	{
+		char	hex_str[3];
+
+		// If odd, add a 0 at the beginning
+		if (is_odd && j == pattern_len - 1)
+		{
+			hex_str[0] = '0';
+			hex_str[1] = pattern[j];
+		}
+		else
+		{
+			hex_str[0] = pattern[j];
+			hex_str[1] = pattern[j + 1];
+			j++;
+		}
+
+		hex_str[2] = '\0';
+		packet[i] = (unsigned char)strtol(hex_str, NULL, 16);
+
+		j++;
+		if (j >= pattern_len)
+			j = 0;
+		i++;
+	}
 }

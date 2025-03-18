@@ -28,6 +28,7 @@
 # include <signal.h>
 # include <math.h>
 # include <getopt.h>
+# include <ctype.h>
 
 # define PACKET_SIZE 64
 # define RECV_BUFFER_SIZE 128
@@ -64,7 +65,7 @@ typedef struct	s_flags
 	int				n;
 	long long		w;
 	long long		W;
-	int				p;
+	char*			p;
 	int				r;
 	int				s;
 	int				T;
@@ -76,7 +77,7 @@ typedef struct s_ping
 	char				*host;
 	char				*ip;
 	int					socketfd;
-	char				packet[PACKET_SIZE];
+	unsigned char				packet[PACKET_SIZE];
 	struct	sockaddr_in	dest_addr;
 	struct	sockaddr_in recv_addr;
 	struct	icmphdr		*dest_icmp;
@@ -109,10 +110,14 @@ void			error(int code, t_ping *ping);
 void			handle_sigint(int sig);
 unsigned short	checksum(void *b, int len);
 void			check_sigint(t_ping *ping);
+void			is_valid_hex_pattern(char *pattern, t_ping *ping);
+void			fill_pattern(unsigned char *packet, const char *pattern, size_t len);
 
 // print.c
 void			printf_header(t_ping *ping);
 void			print_stats(t_ping *ping);
 void			print_help();
+void			print_invalid(char c);
+void			print_requires(char c);
 
 #endif

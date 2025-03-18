@@ -64,3 +64,15 @@ void	print_help()
 	PRINT_OPT_L("--usage", "give a short usage message");
 	PRINT_OPT_S("-V,", "print program version");
 }
+
+void	print_invalid(char c)
+{
+	fprintf(stderr, "./ft_ping: invalid option -- '%c'\n", c);
+	fprintf(stderr, "Try './ft_ping --help' or './ft_ping --usage' for more information.\n");
+}
+
+void	print_requires(char c)
+{
+	fprintf(stderr, "./ft_ping: option requires an argument -- '%c'\n", c);
+	fprintf(stderr, "Try './ft_ping --help' or './ft_ping --usage' for more information.\n");
+}
