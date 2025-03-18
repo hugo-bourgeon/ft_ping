@@ -14,19 +14,23 @@
 
 void	init_struct(t_ping *ping)
 {
+	ping->socketfd		= -1;
+	ping->addr_len		= 0;
 	ping->ip			= NULL;
 	ping->host			= NULL;
-	ping->socketfd		= -1;
 	ping->dest_icmp		= NULL;
 	ping->recv_icmp		= NULL;
-	ping->addr_len		= 0;
+	ping->packet		= NULL;
 
 	memset(&ping->time_now, 0, sizeof(struct timeval));
 	memset(&ping->time_last, 0, sizeof(struct timeval));
 
 	ping->stats = malloc(sizeof(t_stats));
 	if (!ping->stats)
+	{
+		perror("malloc");
 		error(EXIT_FAILURE, ping);
+	}
 	ping->stats->print = 0;
 	ping->stats->min = 999999;
 	ping->stats->max = 0;
@@ -38,7 +42,10 @@ void	init_struct(t_ping *ping)
 
 	ping->flags = malloc(sizeof(t_flags));
 	if (!ping->flags)
+	{
+		perror("malloc");
 		error(EXIT_FAILURE, ping);
+	}
 	ping->flags->v = NOTSET;
 	ping->flags->f = NOTSET;
 	ping->flags->l = NOTSET;
@@ -47,9 +54,10 @@ void	init_struct(t_ping *ping)
 	ping->flags->W = 1;
 	ping->flags->p = NULL;
 	ping->flags->r = NOTSET;
-	ping->flags->s = NOTSET;
+	ping->flags->s = 64;
 	ping->flags->T = NOTSET;
 	ping->flags->ttl = NOTSET;
+	// print_struct(ping);
 }
 
 void	init_socket_dest(t_ping *ping)
@@ -71,18 +79,24 @@ void	init_socket_dest(t_ping *ping)
 void	init_icmp_packet(t_ping *ping)
 {
 	// ICMP packet
+	ping->packet = malloc(ping->flags->s);
+	if (!ping->packet)
+	{
+		perror("malloc");
+		error(EXIT_FAILURE, ping);
+	}
+	memset(ping->packet, 0, ping->flags->s);
 	ping->dest_icmp = (struct icmphdr *)ping->packet;	
-	memset(ping->packet, 0, PACKET_SIZE);
 	ping->dest_icmp->type				= ICMP_ECHO;
 	ping->dest_icmp->code				= 0;
 	ping->dest_icmp->checksum			= 0;
 	ping->dest_icmp->checksum 			= checksum(ping->packet, sizeof(ping->packet));
 	ping->dest_icmp->un.echo.id			= getpid();
-	ping->dest_icmp->un.echo.sequence	= 0;
+	ping->dest_icmp->un.echo.sequence	= -1;
 
 	// ICMP payload
 	unsigned char	*payload		= ping->packet + sizeof(struct icmphdr) + 16;
-	size_t			payload_size	= PACKET_SIZE - sizeof(struct icmphdr) - 16;
+	size_t			payload_size	= ping->flags->s - sizeof(struct icmphdr) - 16;
 
 	if (ping->flags->p)
 		fill_pattern(payload, ping->flags->p, payload_size);

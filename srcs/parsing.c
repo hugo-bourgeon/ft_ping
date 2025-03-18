@@ -133,9 +133,21 @@ void	parsing(int ac, char **av, t_ping *ping)
 				strcpy(ping->flags->p, optarg);
 				break;
 
-			case 's': 
-				if (!optarg) { fprintf(stderr, "Error: -s requires an argument\n"); error(EXIT_FAILURE, ping); }
-				ping->flags->s = atoi(optarg); 
+			case 's':
+				for (int i = 0; optarg[i]; i++)
+				{
+					if (optarg[i] < '0' || optarg[i] > '9')
+					{
+						fprintf(stderr, "ping: invalid value ('%s' near '%s')\n", optarg, &optarg[i]);
+						error(EXIT_FAILURE, ping);
+					}
+				}
+				if (atoll(optarg) < 0 || atoll(optarg) > 65399 || strlen(optarg) > 5)
+				{
+					fprintf(stderr, "ping: option value too big: %s\n", optarg);
+					error(EXIT_FAILURE, ping);
+				}
+				ping->flags->s = atoi(optarg) + sizeof(struct icmphdr);
 				break;
 
 			case 'T':

@@ -77,7 +77,10 @@ void	process(t_ping *ping)
 			g_stop_code = STOP;
 
 		if (ping->flags->f != NOTSET || ping->flags->l != NOTSET)
+		{
 			timeout.tv_sec = 0;
+			timeout.tv_usec = 0;
+		}
 		check_sigint(ping);
 
 		// Wait 1 second complement
@@ -91,11 +94,11 @@ void	process(t_ping *ping)
 void	handle_send(t_ping *ping)
 {
 	// Update ICMP sequence number
-	ping->dest_icmp->un.echo.sequence = htons(ntohs(ping->dest_icmp->un.echo.sequence) + 1);
 	ping->dest_icmp->checksum = 0;
 	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
+	ping->dest_icmp->un.echo.sequence = htons(ntohs(ping->dest_icmp->un.echo.sequence) + 1);
 	gettimeofday(&ping->time_last, NULL);
-	if (sendto(ping->socketfd, ping->packet, PACKET_SIZE, 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) < 0)
+	if (sendto(ping->socketfd, ping->packet, ping->flags->s, 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) < 0)
 	{
 		perror("sendto");
 		error(EXIT_FAILURE, ping);
@@ -111,9 +114,9 @@ void	handle_receive(t_ping *ping)
 
 	int bytes_received;
 	if (ping->flags->f != NOTSET || ping->flags->l == NOTSET)
-		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, PACKET_SIZE, 0, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
+		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, ping->flags->s, 0, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
 	else
-		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, PACKET_SIZE, MSG_DONTWAIT, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
+		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, ping->flags->s, MSG_DONTWAIT, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
 	gettimeofday(&ping->time_now, NULL);
 	if (bytes_received < 0)
 	{
@@ -134,7 +137,11 @@ void	handle_receive(t_ping *ping)
 
 		if (ping->flags->f == NOTSET)
 			printf("%d bytes from %s: icmp_seq=%u ttl=%d time=%.3f ms\n", \
-		bytes_received, ping->ip, ping->dest_icmp->un.echo.sequence - 1, ttl, rtt);
+		bytes_received, \
+		ping->ip, \
+		ntohs(ping->dest_icmp->un.echo.sequence), \
+		ttl, \
+		rtt);
 		
 		handle_stats(ping, rtt);
 		ping->stats->nb_received++;

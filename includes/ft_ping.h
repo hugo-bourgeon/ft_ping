@@ -30,8 +30,7 @@
 # include <getopt.h>
 # include <ctype.h>
 
-# define PACKET_SIZE 64
-# define RECV_BUFFER_SIZE 128
+# define RECV_BUFFER_SIZE 65536
 # define PROCESS 0
 # define STOP 1
 # define NOTSET -1
@@ -77,7 +76,7 @@ typedef struct s_ping
 	char				*host;
 	char				*ip;
 	int					socketfd;
-	unsigned char				packet[PACKET_SIZE];
+	unsigned char		*packet;
 	struct	sockaddr_in	dest_addr;
 	struct	sockaddr_in recv_addr;
 	struct	icmphdr		*dest_icmp;
@@ -89,6 +88,9 @@ typedef struct s_ping
 	t_stats				*stats;
 	t_flags				*flags;
 }	t_ping;
+
+
+void	print_struct(t_ping * ping);
 
 // ping.c
 void			process(t_ping *ping);

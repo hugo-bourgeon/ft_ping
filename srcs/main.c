@@ -13,7 +13,6 @@
 #include "ft_ping.h"
 
 int		g_stop_code = PROCESS;
-void	print_struct(t_ping * ping);
 
 int	main(int ac, char **av)
 {
@@ -37,7 +36,7 @@ int	main(int ac, char **av)
 	return (0);
 }
 
-void	print_struct(t_ping * ping)
+void	print_struct(t_ping *ping)
 {
 	printf("ip:   %s\n", ping->ip);
 	printf("host: %s\n", ping->host);

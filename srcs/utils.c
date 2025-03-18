@@ -16,12 +16,14 @@ void	error(int code, t_ping *ping)
 {
 	if (ping->socketfd > 0)
 		close(ping->socketfd);
-	if (ping->stats->print)
+	if (ping->stats && ping->stats->print)
 		print_stats(ping);
 	if (ping->ip)
 		free(ping->ip);
 	if (ping->host)
 		free(ping->host);
+	if (ping->packet)
+		free(ping->packet);
 	if (ping->stats)
 		free(ping->stats);
 	if (ping->flags)
