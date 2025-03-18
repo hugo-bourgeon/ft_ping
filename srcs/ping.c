@@ -24,9 +24,9 @@ void	process(t_ping *ping)
 	// Set total timeout
 	if (ping->flags->w != NOTSET)
 	{
-        gettimeofday(&time_limit, NULL);
-        time_limit.tv_sec += ping->flags->w;
-    }
+		gettimeofday(&time_limit, NULL);
+		time_limit.tv_sec += ping->flags->w;
+	}
 
 	while (1)
 	{
@@ -53,14 +53,14 @@ void	process(t_ping *ping)
 		// Check total timeout remaining time
 		if (ping->flags->w != NOTSET)
 		{
-            long remaining_sec = time_limit.tv_sec - ping->time_now.tv_sec;
-            long remaining_usec = time_limit.tv_usec - ping->time_now.tv_usec;
-            if (remaining_usec < 0)
+			long remaining_sec = time_limit.tv_sec - ping->time_now.tv_sec;
+			long remaining_usec = time_limit.tv_usec - ping->time_now.tv_usec;
+			if (remaining_usec < 0)
 			{
-                remaining_sec--;
-                remaining_usec += 1000000;
-            }
-            if (remaining_sec < 1)
+				remaining_sec--;
+				remaining_usec += 1000000;
+			}
+			if (remaining_sec < 1)
 			{
 				timeout.tv_sec--;
 				timeout.tv_usec = remaining_usec;
@@ -91,7 +91,7 @@ void	process(t_ping *ping)
 void	handle_send(t_ping *ping)
 {
 	// Update ICMP sequence number
-	ping->dest_icmp->un.echo.sequence++;
+	ping->dest_icmp->un.echo.sequence = htons(ntohs(ping->dest_icmp->un.echo.sequence) + 1);
 	ping->dest_icmp->checksum = 0;
 	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
 	gettimeofday(&ping->time_last, NULL);
