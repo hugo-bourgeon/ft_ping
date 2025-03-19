@@ -14,7 +14,7 @@
 
 void	printf_header(t_ping *ping)
 {
-	printf("PING %s (%s): %d data bytes", ping->host, ping->ip, ping->flags->s - 8);
+	printf("PING %s (%s): %lld data bytes", ping->host, ping->ip, ping->flags->s - 8);
 	if (ping->flags->v != NOTSET)
 		printf(", id Ox%x = %d", ping->dest_icmp->un.echo.id, ping->dest_icmp->un.echo.id);
 	printf("\n");

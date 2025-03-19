@@ -95,8 +95,8 @@ void	handle_send(t_ping *ping)
 {
 	// Update ICMP sequence number
 	ping->dest_icmp->checksum = 0;
-	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
 	ping->dest_icmp->un.echo.sequence = htons(ntohs(ping->dest_icmp->un.echo.sequence) + 1);
+	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
 	gettimeofday(&ping->time_last, NULL);
 	if (sendto(ping->socketfd, ping->packet, ping->flags->s, 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) < 0)
 	{
@@ -128,8 +128,18 @@ void	handle_receive(t_ping *ping)
 	struct iphdr *ip_header	= (struct iphdr *)ping->recv_buffer;
 	ping->recv_icmp			= (struct icmphdr *)(ping->recv_buffer + (ip_header->ihl * 4)); // ignore IP header
 
-	if ((ping->recv_icmp->type == ICMP_ECHOREPLY && ping->recv_icmp->code == 0) \
-		|| (ping->recv_icmp->type == ICMP_ECHO && ping->recv_icmp->code == 0 && strncmp(ping->host,ping->ip, strlen(ping->ip)+1) == 0))
+	// If ICMP_ECHO received -> try recvfrom again
+	if (ping->recv_icmp->type == ICMP_ECHO)
+	{
+		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, ping->flags->s, MSG_DONTWAIT, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
+		gettimeofday(&ping->time_now, NULL);
+		
+		ip_header	= (struct iphdr *)ping->recv_buffer;
+		ping->recv_icmp			= (struct icmphdr *)(ping->recv_buffer + (ip_header->ihl * 4)); // ignore IP header
+	}
+
+	// Handle ICMP_ECHOREPLY
+	if ((ping->recv_icmp->type == ICMP_ECHOREPLY && ping->recv_icmp->code == 0))
 	{
 		int		ttl	= ip_header->ttl;
 		double	rtt	= (ping->time_now.tv_sec - ping->time_last.tv_sec) * 1000.0 + 
@@ -146,9 +156,20 @@ void	handle_receive(t_ping *ping)
 		handle_stats(ping, rtt);
 		ping->stats->nb_received++;
 	}
+	// Handle ttl Exceeded
+	else if (ping->recv_icmp->type == ICMP_TIME_EXCEEDED)
+	{
+		printf("%d bytes from %s: Time to live exceeded\n", \
+			bytes_received, \
+			inet_ntoa(ping->recv_addr.sin_addr));
+		ping->stats->nb_lost++;
+	}
+	// Handle Destination Unreachable (ICMP Type 3)
 	else
 	{
-		printf("%d bytes from %s (%s): Destination Host Unreachable\n", bytes_received, ping->host, inet_ntoa(ping->recv_addr.sin_addr));
+		printf("%d bytes from %s: Destination Host Unreachable\n", \
+			bytes_received, \
+			inet_ntoa(ping->recv_addr.sin_addr));
 		ping->stats->nb_lost++;
 	}
 }

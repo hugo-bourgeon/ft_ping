@@ -48,7 +48,7 @@ void	print_struct(t_ping *ping)
 	printf("flag W:    %lld\n", ping->flags->W);
 	printf("flag p:    %s\n", ping->flags->p);
 	printf("flag r:    %d\n", ping->flags->r);
-	printf("flag s:    %d\n", ping->flags->s);
+	printf("flag s:    %lld\n", ping->flags->s);
 	printf("flag T:    %d\n", ping->flags->T);
 	printf("flag ttl:  %d\n", ping->flags->ttl);
 
