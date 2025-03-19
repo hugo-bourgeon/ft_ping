@@ -77,6 +77,16 @@ void	init_socket_dest(t_ping *ping)
 		error(EXIT_FAILURE, ping);
 	}
 
+	if (ping->flags->r != NOTSET)
+	{
+		int flag = 1;
+		if (setsockopt(ping->socketfd, SOL_SOCKET, SO_DONTROUTE, &flag, sizeof(flag)) < 0)
+		{
+			perror("setsockopt SO_DONTROUTE");
+			error(EXIT_FAILURE, ping);
+		}
+	}
+
 	// Fill in the destination information
 	memset(&ping->dest_addr, 0, sizeof(ping->dest_addr));
 	ping->dest_addr.sin_family		= AF_INET;

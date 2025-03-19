@@ -50,6 +50,12 @@ void	process(t_ping *ping)
 		timeout.tv_sec	= ping->flags->W;
 		timeout.tv_usec	= 0;
 
+		if (ping->flags->f != NOTSET)
+		{
+			timeout.tv_sec = 0;
+			timeout.tv_usec = 25000;
+		}
+
 		// Check total timeout remaining time
 		if (ping->flags->w != NOTSET)
 		{
@@ -133,7 +139,12 @@ void	handle_receive(t_ping *ping)
 	{
 		bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, ping->flags->s, MSG_DONTWAIT, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
 		gettimeofday(&ping->time_now, NULL);
-		
+		if (bytes_received < 0)
+		{
+			perror("recvfrom");
+			error(EXIT_FAILURE, ping);
+		}
+
 		ip_header	= (struct iphdr *)ping->recv_buffer;
 		ping->recv_icmp			= (struct icmphdr *)(ping->recv_buffer + (ip_header->ihl * 4)); // ignore IP header
 	}
@@ -159,9 +170,20 @@ void	handle_receive(t_ping *ping)
 	// Handle ttl Exceeded
 	else if (ping->recv_icmp->type == ICMP_TIME_EXCEEDED)
 	{
-		printf("%d bytes from %s: Time to live exceeded\n", \
-			bytes_received, \
-			inet_ntoa(ping->recv_addr.sin_addr));
+		if (ping->flags->n != NOTSET)
+			printf("%d bytes from %s: Time to live exceeded\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
+		else
+		{
+			struct in_addr	source_addr;
+			source_addr.s_addr = ip_header->saddr;
+		
+			// DNS reverse lookup
+			struct hostent *host_entry_source = gethostbyaddr(&source_addr, sizeof(source_addr), AF_INET);
+			if (host_entry_source != NULL)
+				printf("%d bytes from %s (%s): Time to live exceeded\n", bytes_received, host_entry_source->h_name, inet_ntoa(ping->recv_addr.sin_addr));
+			else
+				printf("%d bytes from %s: Time to live exceeded\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
+		}
 		ping->stats->nb_lost++;
 	}
 	// Handle Destination Unreachable (ICMP Type 3)

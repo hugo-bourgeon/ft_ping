@@ -22,6 +22,12 @@ void	printf_header(t_ping *ping)
 
 void	print_stats(t_ping *ping)
 {
+	if (ping->flags->f != NOTSET)
+	{
+		for (size_t i = 0; i < ping->stats->nb_lost; i++)
+			printf(".");
+	}
+
 	printf("--- %s ping statistics ---\n", ping->host);
 	
 	printf("%zu packets transmitted, %zu packets received, %.0f%% packet loss\n", \
