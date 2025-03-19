@@ -23,11 +23,13 @@ void	parsing(int ac, char **av, t_ping *ping)
 	int						opt;
 	static struct option	long_options[] = 
 	{
-		{"ttl",	required_argument,	0,	1},
-		{0,		0,					0,	0}
+		{"ttl",		required_argument,	0,	FLAG_TTL},
+		{"usage",	no_argument,		0,	FLAG_USAGE},
+		{"help",	no_argument,		0,	FLAG_HELP},
+		{0,			0,					0,	0}
 	};
 
-	opterr = 0;
+	// opterr = 0;
 	while ((opt = getopt_long(ac, av, "vrnf? :l:w:W:p:s:T:", long_options, NULL)) != -1)
 	{
 		switch (opt)
@@ -38,8 +40,6 @@ void	parsing(int ac, char **av, t_ping *ping)
 			case 'r': ping->flags->r = 1; break;
 
 			case 'l':
-				if (!optarg) { fprintf(stderr, "ping: option requires an argument -- 'l'\n"); error(EXIT_FAILURE, ping); }
-				 
 				for (int i = 0; optarg[i]; i++)
 				{
 					if (optarg[i] < '0' || optarg[i] > '9')
@@ -48,76 +48,65 @@ void	parsing(int ac, char **av, t_ping *ping)
 						error(EXIT_FAILURE, ping);
 					}
 				}
-				if (strlen(optarg) > strlen("2147483647")) 
-				{
-					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg); 
-					error(EXIT_FAILURE, ping);
-				}
 
 				ping->flags->l = atoll(optarg);
-				if (ping->flags->l < 0 || ping->flags->l > 2147483647)
+				if (ping->flags->l < 0 \
+					|| strlen(optarg) > strlen("2499"))
 				{
 					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+					error(EXIT_FAILURE, ping);
+				}
+				if (ping->flags->l > 2499)
+				{
+					fprintf(stderr, "ping: sending packet: No buffer space available\n");
 					error(EXIT_FAILURE, ping);
 				}
 				break;
 
-			case 'w': 
-				if (!optarg) { fprintf(stderr, "ping: option requires an argument -- 'w'\n"); error(EXIT_FAILURE, ping); }
-
+			case 'w':
 				for (int i = 0; optarg[i]; i++)
 				{
 					if (optarg[i] < '0' || optarg[i] > '9')
 					{
-						fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+						fprintf(stderr, "ping: invalid value (`%s' near `%s')\n", optarg, &optarg[i]);
 						error(EXIT_FAILURE, ping);
 					}
 				}
-				if (strlen(optarg) > strlen("2147483647")) 
-				{
-					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg); 
-					error(EXIT_FAILURE, ping);
-				}
 
 				ping->flags->w = atoll(optarg); 
-				if (ping->flags->w < 0 || ping->flags->l > 2147483647)
+				if ((ping->flags->w > 2147483647) \
+					|| (strlen(optarg) > strlen("2147483647")))
 				{
-					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+					fprintf(stderr, "ping: option value too big: %s\n", optarg);
 					error(EXIT_FAILURE, ping);
 				}
 				if (ping->flags->w == 0)
 				{
-					fprintf(stderr, "ping: option value too small: (%s)\n", optarg);
+					fprintf(stderr, "ping: option value too small: %s\n", optarg);
 					error(EXIT_FAILURE, ping);
 				}
 				break;
 
 			case 'W': 
-				if (!optarg) { fprintf(stderr, "ping: option requires an argument -- 'W'\n"); error(EXIT_FAILURE, ping); }
-
 				for (int i = 0; optarg[i]; i++)
 				{
 					if (optarg[i] < '0' || optarg[i] > '9')
 					{
-						fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+						fprintf(stderr, "ping: invalid value (`%s' near `%s')\n", optarg, &optarg[i]);
 						error(EXIT_FAILURE, ping);
 					}
 				}
-				if (strlen(optarg) > strlen("2147483647")) 
-				{
-					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg); 
-					error(EXIT_FAILURE, ping);
-				}
 
-				ping->flags->W = atoll(optarg);
-				if (ping->flags->W < 0 || ping->flags->W > 2147483647)
+				ping->flags->W = atoll(optarg); 
+				if ((ping->flags->W > 2147483647) \
+					|| (strlen(optarg) > strlen("2147483647")))
 				{
-					fprintf(stderr, "ping: invalid preload value (%s)\n", optarg);
+					fprintf(stderr, "ping: option value too big: %s\n", optarg);
 					error(EXIT_FAILURE, ping);
 				}
 				if (ping->flags->W == 0)
 				{
-					fprintf(stderr, "ping: option value too small: (%s)\n", optarg);
+					fprintf(stderr, "ping: option value too small: %s\n", optarg);
 					error(EXIT_FAILURE, ping);
 				}
 				break;
@@ -142,49 +131,63 @@ void	parsing(int ac, char **av, t_ping *ping)
 						error(EXIT_FAILURE, ping);
 					}
 				}
-				if (atoll(optarg) < 0 || atoll(optarg) > 65399 || strlen(optarg) > 5)
+
+				ping->flags->s = atoll(optarg);
+				if (ping->flags->s < 0 || ping->flags->s > 65399 \
+					|| strlen(optarg) > 5)
 				{
 					fprintf(stderr, "ping: option value too big: %s\n", optarg);
 					error(EXIT_FAILURE, ping);
 				}
-				ping->flags->s = atoi(optarg) + sizeof(struct icmphdr);
+				ping->flags->s += sizeof(struct icmphdr);
 				break;
 
 			case 'T':
-				if (!optarg) { 
+				if (!optarg)
+				{ 
 					fprintf(stderr, "Error: -T requires an argument (tsonly, tsandaddr, tsprespec)\n"); 
 					error(EXIT_FAILURE, ping); 
 				}
 				ping->flags->T = 0;  // imcomplet
 				break;
 
-			case 1:  // --ttl <value>
-				if (!optarg) { fprintf(stderr, "Error: --ttl requires an argument\n"); error(EXIT_FAILURE, ping); }
+			case FLAG_TTL:  // --ttl <value>
 				ping->flags->ttl = atoi(optarg);
-				if (ping->flags->ttl < 1 || ping->flags->ttl > 255) {
-					fprintf(stderr, "Error: TTL must be between 1 and 255.\n");
+				if (ping->flags->ttl < 1)
+				{
+					fprintf(stderr, "ping: option value too small: %s\n", optarg);
+					error(EXIT_FAILURE, ping);
+				}
+				if (ping->flags->ttl > 255 || strlen(optarg) > 3)
+				{
+					fprintf(stderr, "ping: option value too big: %s\n", optarg);
 					error(EXIT_FAILURE, ping);
 				}
 				break;
+			
+			case FLAG_USAGE:
+				print_usage();
+				error(EXIT_SUCCESS, ping);
+				break;
+			
+			case FLAG_HELP:
+				print_help();
+				error(EXIT_SUCCESS, ping);
+				break;
 
 			case '?':
-				if (optopt == 0 && opt == '?')
+				if (strncmp("-?", av[optind - 1], strlen(av[optind - 1]) + 1) == 0)
 				{
 					print_help();
 					error(EXIT_SUCCESS, ping);
 				}
-				else
-				{
-					if (!optarg)
-						print_requires(optopt);
-					else
-						print_invalid(optopt);
-					error(EXIT_FAILURE, ping);
-				}
+				fprintf(stderr, "Try './ft_ping --help' or './ft_ping --usage' for more information.\n");
+				error(EXIT_FAILURE, ping);
 		}
 	}
 
-	if (optind >= ac) {
+	if (optind >= ac)
+	{
 		fprintf(stderr, "Error: missing host operand\n");
 		error(EXIT_FAILURE, ping);
 	}
@@ -194,7 +197,6 @@ void	parsing(int ac, char **av, t_ping *ping)
 
 void	setup_ip(char *ip, t_ping *ping)
 {
-	// printf("ip: %s\n", ip);
 	struct addrinfo	hints, *res;
 	int				status;
 
