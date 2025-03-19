@@ -34,9 +34,14 @@
 # define PROCESS 0
 # define STOP 1
 # define NOTSET -1
-# define TSONLY 10
-# define TSANDADDR 11
-# define TSPRESPEC 12
+
+// # define TSONLY 10
+// # define TSANDADDR 11
+// # define TSPRESPEC 12
+
+# define FLAG_TTL 1
+# define FLAG_USAGE 2
+# define FLAG_HELP 3
 
 # define PRINT_OPT(short, long, msg) printf("  %-4s %-21s %s\n", short, long, msg);
 # define PRINT_OPT_S(short, msg)     PRINT_OPT(short, "", msg)
@@ -66,7 +71,7 @@ typedef struct	s_flags
 	long long		W;
 	char*			p;
 	int				r;
-	int				s;
+	long long		s;
 	int				T;
 	int				ttl;
 }	t_flags;
@@ -119,7 +124,6 @@ void			fill_pattern(unsigned char *packet, const char *pattern, size_t len);
 void			printf_header(t_ping *ping);
 void			print_stats(t_ping *ping);
 void			print_help();
-void			print_invalid(char c);
-void			print_requires(char c);
+void			print_usage();
 
 #endif

@@ -36,6 +36,13 @@ void	print_stats(t_ping *ping)
 		ping->stats->min, avg, ping->stats->max, mdev);
 }
 
+void	print_usage()
+{
+	printf("Usage: ping [-nrvf?] [-T NUM] [-w N] [-W N] [-l NUMBER]\n"); 
+	printf("            [-p PATTERN] [-s NUMBER] [--ttl=N] [--help] [--usage]\n");
+	printf("            HOST ...\n");
+}
+
 void	print_help()
 {
 	printf("Usage: ft_ping [OPTION...] HOST ...\n");
@@ -63,16 +70,4 @@ void	print_help()
 	PRINT_OPT("-?,", "--help", "give this help list");
 	PRINT_OPT_L("--usage", "give a short usage message");
 	PRINT_OPT_S("-V,", "print program version");
-}
-
-void	print_invalid(char c)
-{
-	fprintf(stderr, "./ft_ping: invalid option -- '%c'\n", c);
-	fprintf(stderr, "Try './ft_ping --help' or './ft_ping --usage' for more information.\n");
-}
-
-void	print_requires(char c)
-{
-	fprintf(stderr, "./ft_ping: option requires an argument -- '%c'\n", c);
-	fprintf(stderr, "Try './ft_ping --help' or './ft_ping --usage' for more information.\n");
 }
