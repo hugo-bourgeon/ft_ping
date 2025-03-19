@@ -69,6 +69,14 @@ void	init_socket_dest(t_ping *ping)
 		error(EXIT_FAILURE, ping);
 	}
 
+	// Set the TTL (Time To Live) option
+	int ttl = ping->flags->ttl;
+	if (setsockopt(ping->socketfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
+	{
+		perror("setsockopt TTL");
+		error(EXIT_FAILURE, ping);
+	}
+
 	// Fill in the destination information
 	memset(&ping->dest_addr, 0, sizeof(ping->dest_addr));
 	ping->dest_addr.sin_family		= AF_INET;
@@ -90,14 +98,14 @@ void	init_icmp_packet(t_ping *ping)
 	ping->dest_icmp->type				= ICMP_ECHO;
 	ping->dest_icmp->code				= 0;
 	ping->dest_icmp->checksum			= 0;
-	ping->dest_icmp->checksum 			= checksum(ping->packet, sizeof(ping->packet));
 	ping->dest_icmp->un.echo.id			= getpid();
 	ping->dest_icmp->un.echo.sequence	= -1;
-
+	
 	// ICMP payload
 	unsigned char	*payload		= ping->packet + sizeof(struct icmphdr) + 16;
 	size_t			payload_size	= ping->flags->s - sizeof(struct icmphdr) - 16;
-
+	
 	if (ping->flags->p)
-		fill_pattern(payload, ping->flags->p, payload_size);
+	fill_pattern(payload, ping->flags->p, payload_size);
+	ping->dest_icmp->checksum 			= checksum(ping->packet, sizeof(ping->packet));
 }
