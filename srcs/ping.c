@@ -168,11 +168,11 @@ void	handle_receive(t_ping *ping)
 
 		if (ping->flags->f == NOTSET)
 			printf("%d bytes from %s: icmp_seq=%u ttl=%d time=%.3f ms\n", \
-		bytes_received, \
-		ping->ip, \
-		ntohs(ping->dest_icmp->un.echo.sequence), \
-		ttl, \
-		rtt);
+			bytes_received, \
+			ping->ip, \
+			ntohs(ping->dest_icmp->un.echo.sequence), \
+			ttl, \
+			rtt);
 		
 		handle_stats(ping, rtt);
 		ping->stats->nb_received++;
@@ -193,6 +193,46 @@ void	handle_receive(t_ping *ping)
 				printf("%d bytes from %s (%s): Time to live exceeded\n", bytes_received, host_entry_source->h_name, inet_ntoa(ping->recv_addr.sin_addr));
 			else
 				printf("%d bytes from %s: Time to live exceeded\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
+		}
+		if (ping->flags->v != NOTSET) // Verbose mode
+		{
+			// Extract the original IP header from the ICMP payload
+			struct iphdr *original_ip_header = (struct iphdr *)((uint8_t *)ping->recv_icmp + sizeof(struct icmphdr));
+
+			// Extract the original ICMP header from the original IP payload
+			struct icmphdr *original_icmp_header = (struct icmphdr *)((uint8_t *)original_ip_header + (original_ip_header->ihl * 4));
+
+			// Print the original IP header
+			printf("IP Hdr Dump:\n");
+			for (size_t i = 0; i < sizeof(struct iphdr); i += 2)
+			{
+				printf(" %02x%02x", ((uint8_t *)original_ip_header)[i] & 0xFF, ((uint8_t *)original_ip_header)[i + 1] & 0xFF);
+			}
+			printf("\n");
+
+			// Print detailed IP header information
+			printf("Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src\tDst\tData\n");
+			printf(" %1x  %1x  %02x %04x %04x   %1x %04x  %02x  %02x %04x %s  %s\n",
+				original_ip_header->version,
+				original_ip_header->ihl,
+				original_ip_header->tos,
+				ntohs(original_ip_header->tot_len),
+				ntohs(original_ip_header->id),
+				(ntohs(original_ip_header->frag_off) & 0xE000) >> 13,
+				ntohs(original_ip_header->frag_off) & 0x1FFF,
+				original_ip_header->ttl,
+				original_ip_header->protocol,
+				ntohs(original_ip_header->check),
+				inet_ntoa(*(struct in_addr *)&original_ip_header->saddr),
+				inet_ntoa(*(struct in_addr *)&original_ip_header->daddr));
+
+			// Print ICMP information
+			printf("ICMP: type %d, code %d, size %lu, id 0x%04x, seq 0x%04x\n",
+				original_icmp_header->type,
+				original_icmp_header->code,
+				bytes_received - (ip_header->ihl * 4) - sizeof(struct icmphdr), // Taille de l'ICMP original
+				ntohs(original_icmp_header->un.echo.id),   // Convertir en ordre d'octets hôte
+				ntohs(original_icmp_header->un.echo.sequence)); // Convertir en ordre d'octets hôte
 		}
 		ping->stats->nb_lost++;
 	}
