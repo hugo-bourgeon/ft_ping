@@ -30,7 +30,6 @@ void	process(t_ping *ping)
 
 	while (1)
 	{
-		
 		check_sigint(ping);
 		handle_send(ping);
 
@@ -133,6 +132,17 @@ void	handle_receive(t_ping *ping)
 	// Extract heander IP et ICMP
 	struct iphdr *ip_header	= (struct iphdr *)ping->recv_buffer;
 	ping->recv_icmp			= (struct icmphdr *)(ping->recv_buffer + (ip_header->ihl * 4)); // ignore IP header
+
+	// Verify checksum
+    uint16_t received_checksum = ping->recv_icmp->checksum;
+    ping->recv_icmp->checksum = 0;
+    uint16_t calculated_checksum = checksum((uint16_t *)ping->recv_icmp, bytes_received - (ip_header->ihl * 4));
+    if (received_checksum != calculated_checksum)
+    {
+        fprintf(stderr, "ping: received packet with bad checksum\n");
+        ping->stats->nb_lost++;
+        return;
+    }
 
 	// If ICMP_ECHO received -> try recvfrom again
 	if (ping->recv_icmp->type == ICMP_ECHO)

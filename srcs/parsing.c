@@ -153,9 +153,9 @@ void	parsing(int ac, char **av, t_ping *ping)
 						error(EXIT_FAILURE, ping);
 					}
 				}
-
+				
 				char *endptr = NULL;
-				long val = strtol(optarg, &endptr, 0); // base 0 → auto (hex ou décimal)
+				long val = strtol(optarg, &endptr, 0); // base 0 -> auto (hex ou décimal)
 				
 				if (*endptr != '\0' || val < 0 || val > 255)
 				{
@@ -165,7 +165,7 @@ void	parsing(int ac, char **av, t_ping *ping)
 				ping->flags->T = (int)val;
 				break;
 
-			case FLAG_TTL:  // --ttl <value>
+			case FLAG_TTL:
 				ping->flags->ttl = atoi(optarg);
 				if (ping->flags->ttl < 1)
 				{
