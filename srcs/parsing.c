@@ -143,12 +143,26 @@ void	parsing(int ac, char **av, t_ping *ping)
 				break;
 
 			case 'T':
-				if (!optarg)
-				{ 
-					fprintf(stderr, "Error: -T requires an argument (tsonly, tsandaddr, tsprespec)\n"); 
-					error(EXIT_FAILURE, ping); 
+				for (int i = 0; optarg[i]; i++)
+				{
+					if (!isdigit(optarg[i]) &&
+						!(i == 1 && optarg[0] == '0' && (optarg[1] == 'x' || optarg[1] == 'X')) &&
+						!(i > 1 && isxdigit(optarg[i]) && optarg[0] == '0' && (optarg[1] == 'x' || optarg[1] == 'X')))
+					{
+						fprintf(stderr, "ping: invalid value ('%s' near '%s')\n", optarg, &optarg[i]);
+						error(EXIT_FAILURE, ping);
+					}
 				}
-				ping->flags->T = 0;  // imcomplet
+
+				char *endptr = NULL;
+				long val = strtol(optarg, &endptr, 0); // base 0 → auto (hex ou décimal)
+				
+				if (*endptr != '\0' || val < 0 || val > 255)
+				{
+					fprintf(stderr, "ping: option value too big: %s\n", optarg); 
+					error(EXIT_FAILURE, ping);
+				}
+				ping->flags->T = (int)val;
 				break;
 
 			case FLAG_TTL:  // --ttl <value>

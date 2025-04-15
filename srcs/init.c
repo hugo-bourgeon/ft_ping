@@ -77,12 +77,24 @@ void	init_socket_dest(t_ping *ping)
 		error(EXIT_FAILURE, ping);
 	}
 
+	// SO_DONTROUTE if -r flag is set
 	if (ping->flags->r != NOTSET)
 	{
 		int flag = 1;
 		if (setsockopt(ping->socketfd, SOL_SOCKET, SO_DONTROUTE, &flag, sizeof(flag)) < 0)
 		{
 			perror("setsockopt SO_DONTROUTE");
+			error(EXIT_FAILURE, ping);
+		}
+	}
+
+	// Set the TOS (Type of Service) if specified
+	if (ping->flags->T != NOTSET)
+	{
+		int tos = ping->flags->T;
+		if (setsockopt(ping->socketfd, IPPROTO_IP, IP_TOS, &tos, sizeof(tos)) < 0)
+		{
+			perror("setsockopt TOS");
 			error(EXIT_FAILURE, ping);
 		}
 	}
