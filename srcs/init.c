@@ -12,24 +12,36 @@
 
 #include "ft_ping.h"
 
-void	init_struct(t_ping *ping)
+void	init_struct(t_ping **ping)
 {
-	ping->socketfd		= -1;
-	ping->addr_len		= 0;
-	ping->ip			= NULL;
-	ping->host			= NULL;
-	ping->dest_icmp		= NULL;
-	ping->recv_icmp		= NULL;
-	ping->packet		= NULL;
+	*ping = malloc(sizeof(t_ping));
+	if (!(*ping))
+	{
+		perror("malloc");
+		free_all(EXIT_FAILURE, *ping);
+	}
 
-	memset(&ping->time_now, 0, sizeof(struct timeval));
-	memset(&ping->time_last, 0, sizeof(struct timeval));
+	(*ping)->socketfd		= -1;
+	(*ping)->addr_len		= 0;
+	(*ping)->ip				= NULL;
+	(*ping)->host			= NULL;
+	(*ping)->dest_icmp		= NULL;
+	(*ping)->recv_icmp		= NULL;
+	(*ping)->packet			= NULL;
+	memset(&(*ping)->time_now, 0, sizeof(struct timeval));
+	memset(&(*ping)->time_last, 0, sizeof(struct timeval));
 
+	init_stats(*ping);
+	init_flags(*ping);
+}
+
+void	init_stats(t_ping *ping)
+{
 	ping->stats = malloc(sizeof(t_stats));
 	if (!ping->stats)
 	{
 		perror("malloc");
-		error(EXIT_FAILURE, ping);
+		free_all(EXIT_FAILURE, ping);
 	}
 	ping->stats->print = 0;
 	ping->stats->min = 999999;
@@ -39,12 +51,15 @@ void	init_struct(t_ping *ping)
 	ping->stats->nb_sent = 0;
 	ping->stats->nb_received = 0;
 	ping->stats->nb_lost = 0;
+}
 
+void	init_flags(t_ping *ping)
+{
 	ping->flags = malloc(sizeof(t_flags));
 	if (!ping->flags)
 	{
 		perror("malloc");
-		error(EXIT_FAILURE, ping);
+		free_all(EXIT_FAILURE, ping);
 	}
 	ping->flags->v = NOTSET;
 	ping->flags->f = NOTSET;
@@ -57,8 +72,8 @@ void	init_struct(t_ping *ping)
 	ping->flags->s = 64;
 	ping->flags->T = NOTSET;
 	ping->flags->ttl = NOTSET;
-	// print_struct(ping);
 }
+
 
 void	init_socket_dest(t_ping *ping)
 {
@@ -66,7 +81,7 @@ void	init_socket_dest(t_ping *ping)
 	if ((ping->socketfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) < 0)
 	{
 		perror("socket");
-		error(EXIT_FAILURE, ping);
+		free_all(EXIT_FAILURE, ping);
 	}
 
 	// Set the TTL (Time To Live) option
@@ -74,7 +89,7 @@ void	init_socket_dest(t_ping *ping)
 	if (setsockopt(ping->socketfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) < 0)
 	{
 		perror("setsockopt TTL");
-		error(EXIT_FAILURE, ping);
+		free_all(EXIT_FAILURE, ping);
 	}
 
 	// SO_DONTROUTE if -r flag is set
@@ -84,7 +99,7 @@ void	init_socket_dest(t_ping *ping)
 		if (setsockopt(ping->socketfd, SOL_SOCKET, SO_DONTROUTE, &flag, sizeof(flag)) < 0)
 		{
 			perror("setsockopt SO_DONTROUTE");
-			error(EXIT_FAILURE, ping);
+			free_all(EXIT_FAILURE, ping);
 		}
 	}
 
@@ -95,7 +110,7 @@ void	init_socket_dest(t_ping *ping)
 		if (setsockopt(ping->socketfd, IPPROTO_IP, IP_TOS, &tos, sizeof(tos)) < 0)
 		{
 			perror("setsockopt TOS");
-			error(EXIT_FAILURE, ping);
+			free_all(EXIT_FAILURE, ping);
 		}
 	}
 
@@ -113,7 +128,7 @@ void	init_icmp_packet(t_ping *ping)
 	if (!ping->packet)
 	{
 		perror("malloc");
-		error(EXIT_FAILURE, ping);
+		free_all(EXIT_FAILURE, ping);
 	}
 	memset(ping->packet, 0, ping->flags->s);
 	ping->dest_icmp = (struct icmphdr *)ping->packet;	
@@ -126,8 +141,7 @@ void	init_icmp_packet(t_ping *ping)
 	// ICMP payload
 	unsigned char	*payload		= ping->packet + sizeof(struct icmphdr) + 16;
 	size_t			payload_size	= ping->flags->s - sizeof(struct icmphdr) - 16;
-	
 	if (ping->flags->p)
-	fill_pattern(payload, ping->flags->p, payload_size);
+		fill_pattern(payload, ping->flags->p, payload_size);
 	ping->dest_icmp->checksum 			= checksum(ping->packet, sizeof(ping->packet));
 }

@@ -6,7 +6,7 @@
 #    By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/24 14:34:48 by hubourge          #+#    #+#              #
-#    Updated: 2025/03/12 19:04:38 by hubourge         ###   ########.fr        #
+#    Updated: 2025/04/16 15:22:26 by hubourge         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,8 @@ OBJ_DIR		= obj
 
 SRC			=	srcs/main.c \
 				srcs/ping.c \
+				srcs/ping_send.c \
+				srcs/ping_receive.c \
 				srcs/init.c \
 				srcs/utils.c \
 				srcs/parsing.c \

@@ -13,26 +13,19 @@
 #include "ft_ping.h"
 
 int		g_stop_code = PROCESS;
+void	print_struct(t_ping *ping);
 
 int	main(int ac, char **av)
 {
 	t_ping	*ping = NULL;
 
-	ping = malloc(sizeof(t_ping));
-	if (!ping)
-	{
-		perror("malloc");
-		error(EXIT_FAILURE, ping);
-	}
-
-	init_struct(ping);
+	init_struct(&ping);
 	parsing(ac, av, ping);
 	init_socket_dest(ping);
 	init_icmp_packet(ping);
-	print_struct(ping);
 	process(ping);
 	
-	error(-1, ping);
+	free_all(NOT_EXIT, ping);
 	return (0);
 }
 

@@ -12,25 +12,28 @@
 
 #include "ft_ping.h"
 
-void	error(int code, t_ping *ping)
+void	free_all(int code, t_ping *ping)
 {
-	if (ping->socketfd > 0)
-		close(ping->socketfd);
-	if (ping->stats && ping->stats->print)
-		print_stats(ping);
-	if (ping->ip)
-		free(ping->ip);
-	if (ping->host)
-		free(ping->host);
-	if (ping->packet)
-		free(ping->packet);
-	if (ping->stats)
-		free(ping->stats);
-	if (ping->flags)
+	if (ping)
 	{
-		if (ping->flags->p)
-			free(ping->flags->p);
-		free(ping->flags);
+		if (ping->socketfd > 0)
+			close(ping->socketfd);
+		if (ping->stats && ping->stats->print)
+			print_stats(ping);
+		if (ping->ip)
+			free(ping->ip);
+		if (ping->host)
+			free(ping->host);
+		if (ping->packet)
+			free(ping->packet);
+		if (ping->stats)
+			free(ping->stats);
+		if (ping->flags)
+		{
+			if (ping->flags->p)
+				free(ping->flags->p);
+			free(ping->flags);
+		}
 	}
 	if (ping)
 		free(ping);
@@ -49,7 +52,7 @@ void	check_sigint(t_ping *ping)
 	if (g_stop_code == STOP)
 	{
 		ping->stats->print = 1;
-		error(EXIT_SUCCESS, ping);
+		free_all(EXIT_SUCCESS, ping);
 	}
 }
 
@@ -86,7 +89,7 @@ void	is_valid_hex_pattern(char *pattern, t_ping *ping)
 		if (!isxdigit(pattern[i]))
 		{
 			fprintf(stderr, "./ft_ping: error in pattern near %s\n", &pattern[i]);
-			error(EXIT_FAILURE, ping);
+			free_all(EXIT_FAILURE, ping);
 		}
 	}
 }

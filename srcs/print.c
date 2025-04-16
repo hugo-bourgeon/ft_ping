@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 13:12:12 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/12 20:33:17 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/16 18:09:19 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,9 @@ void	print_stats(t_ping *ping)
 	}
 
 	printf("--- %s ping statistics ---\n", ping->host);
-	
 	printf("%zu packets transmitted, %zu packets received, %.0f%% packet loss\n", \
 	ping->stats->nb_sent, ping->stats->nb_received, (double)(ping->stats->nb_sent - ping->stats->nb_received) / ping->stats->nb_sent * 100);
 	
-
 	double avg = ping->stats->avg / ping->stats->nb_received;
 	double mdev = sqrt((ping->stats->mdev / ping->stats->nb_received) - (avg * avg));
 	
@@ -77,3 +75,34 @@ void	print_help()
 	PRINT_OPT_L("--usage", "give a short usage message");
 	PRINT_OPT_S("-V,", "print program version");
 }
+
+void	print_dump(struct iphdr *original_ip_header, struct icmphdr *original_icmp_header, int bytes_received, t_ping *ping)
+{
+	printf("IP Hdr Dump:\n");
+	for (size_t i = 0; i < sizeof(struct iphdr); i += 2)
+		printf(" %02x%02x", ((uint8_t *)original_ip_header)[i] & 0xFF, ((uint8_t *)original_ip_header)[i + 1] & 0xFF);
+	printf("\n");
+
+	printf("Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src\tDst\tData\n");
+	printf(" %1x  %1x  %02x %04x %04x   %1x %04x  %02x  %02x %04x %s  %s\n",
+		original_ip_header->version,
+		original_ip_header->ihl,
+		original_ip_header->tos,
+		ntohs(original_ip_header->tot_len),
+		ntohs(original_ip_header->id),
+		(ntohs(original_ip_header->frag_off) & 0xE000) >> 13,
+		ntohs(original_ip_header->frag_off) & 0x1FFF,
+		original_ip_header->ttl,
+		original_ip_header->protocol,
+		ntohs(original_ip_header->check),
+		inet_ntoa(*(struct in_addr *)&original_ip_header->saddr),
+		inet_ntoa(*(struct in_addr *)&original_ip_header->daddr));
+
+	printf("ICMP: type %d, code %d, size %lu, id 0x%04x, seq 0x%04x\n",
+		original_icmp_header->type,
+		original_icmp_header->code,
+		bytes_received - (ping->recv_header->ihl * 4) - sizeof(struct icmphdr),
+		ntohs(original_icmp_header->un.echo.id),
+		ntohs(original_icmp_header->un.echo.sequence));
+}
+	
