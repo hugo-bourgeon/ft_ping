@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 15:19:38 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/16 18:22:42 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/17 18:32:58 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,13 @@ void	handle_receive(t_ping *ping)
 
 	receive_packet(&bytes_received, ping);
 	gettimeofday(&ping->time_now, NULL);
+
+	if (bytes_received < (int)(sizeof(struct iphdr) + sizeof(struct icmphdr))) // iphdr(20) + icmphdr(8)
+	{
+		printf("%d bytes from %s: Packet too short: minimal config iphdr(20) + icmphdr(8)\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
+		ping->stats->nb_lost++;
+		return ;
+	}
 
 	// Extract header IP et ICMP
 	ping->recv_header	= (struct iphdr *)ping->recv_buffer;
@@ -67,7 +74,7 @@ int	check_checksum(int bytes_received, t_ping *ping)
 	
 	if (received_checksum != calculated_checksum)
 	{
-		fprintf(stderr, "ping: received packet with bad checksum (corrupted packet)\n");
+		printf("%d bytes from %s: Received packet with bad checksum (corrupted packet)\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
 		ping->stats->nb_lost++;
 		return (-1);
 	}

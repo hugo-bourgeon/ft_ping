@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 17:52:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/13 14:57:26 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/17 18:33:19 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,5 +143,5 @@ void	init_icmp_packet(t_ping *ping)
 	size_t			payload_size	= ping->flags->s - sizeof(struct icmphdr) - 16;
 	if (ping->flags->p)
 		fill_pattern(payload, ping->flags->p, payload_size);
-	ping->dest_icmp->checksum 			= checksum(ping->packet, sizeof(ping->packet));
+	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
 }
