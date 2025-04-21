@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/16 18:22:50 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 14:45:07 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,10 @@
 # include <getopt.h>
 # include <ctype.h>
 
-# define RECV_BUFFER_SIZE	65536
+# define ETHERNET_MTU 1500	// Maximum Transmission Unit (ip link show)
+# define PACKET_MAX_SIZE (ETHERNET_MTU - sizeof(struct iphdr) - sizeof(struct icmphdr))
+# define RECV_BUFFER_SIZE 65536
+
 # define NOT_EXIT			-1
 # define PROCESS			0
 # define STOP				1
@@ -79,7 +82,7 @@ typedef struct s_ping
 	char				*host;
 	char				*ip;
 	int					socketfd;
-	unsigned char		*packet;
+	unsigned char		packet[PACKET_MAX_SIZE];
 	struct	sockaddr_in	dest_addr;
 	struct	sockaddr_in recv_addr;
 	struct	icmphdr		*dest_icmp;

@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 00:12:42 by hubourge          #+#    #+#             */
-/*   Updated: 2025/03/12 13:19:56 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 14:44:59 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,6 @@ void	free_all(int code, t_ping *ping)
 			free(ping->ip);
 		if (ping->host)
 			free(ping->host);
-		if (ping->packet)
-			free(ping->packet);
 		if (ping->stats)
 			free(ping->stats);
 		if (ping->flags)

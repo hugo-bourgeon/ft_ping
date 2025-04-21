@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 15:17:20 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/16 15:21:31 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 14:45:27 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 void	update_icmp_checksum(t_ping *ping)
 {
-	ping->dest_icmp->checksum = 0;
 	ping->dest_icmp->un.echo.sequence = htons(ntohs(ping->dest_icmp->un.echo.sequence) + 1);
+	ping->dest_icmp->checksum = 0;
 	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
 }
 

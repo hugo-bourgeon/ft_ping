@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 17:52:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/17 18:33:19 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 14:44:53 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@ void	init_struct(t_ping **ping)
 	(*ping)->host			= NULL;
 	(*ping)->dest_icmp		= NULL;
 	(*ping)->recv_icmp		= NULL;
-	(*ping)->packet			= NULL;
 	memset(&(*ping)->time_now, 0, sizeof(struct timeval));
 	memset(&(*ping)->time_last, 0, sizeof(struct timeval));
 
@@ -124,13 +123,7 @@ void	init_socket_dest(t_ping *ping)
 void	init_icmp_packet(t_ping *ping)
 {
 	// ICMP packet
-	ping->packet = malloc(ping->flags->s);
-	if (!ping->packet)
-	{
-		perror("malloc");
-		free_all(EXIT_FAILURE, ping);
-	}
-	memset(ping->packet, 0, ping->flags->s);
+	memset(ping->packet, 0, PACKET_MAX_SIZE);
 	ping->dest_icmp = (struct icmphdr *)ping->packet;	
 	ping->dest_icmp->type				= ICMP_ECHO;
 	ping->dest_icmp->code				= 0;
@@ -143,5 +136,6 @@ void	init_icmp_packet(t_ping *ping)
 	size_t			payload_size	= ping->flags->s - sizeof(struct icmphdr) - 16;
 	if (ping->flags->p)
 		fill_pattern(payload, ping->flags->p, payload_size);
+
 	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));
 }

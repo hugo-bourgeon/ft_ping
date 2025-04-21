@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 15:19:38 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/17 18:32:58 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 14:44:38 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ int	check_checksum(int bytes_received, t_ping *ping)
 	ping->recv_icmp->checksum = 0;
 	uint16_t calculated_checksum = checksum((uint16_t *)ping->recv_icmp, bytes_received - (ping->recv_header->ihl * 4));
 	
-	if (received_checksum != calculated_checksum)
+	if (ping->flags->p == NULL && received_checksum != calculated_checksum)
 	{
 		printf("%d bytes from %s: Received packet with bad checksum (corrupted packet)\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
 		ping->stats->nb_lost++;
