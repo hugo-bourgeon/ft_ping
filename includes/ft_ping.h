@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 14:34:54 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/21 14:45:07 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:08:57 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,15 @@
 # include <getopt.h>
 # include <ctype.h>
 
-# define ETHERNET_MTU 1500	// Maximum Transmission Unit (ip link show)
-# define PACKET_MAX_SIZE (ETHERNET_MTU - sizeof(struct iphdr) - sizeof(struct icmphdr))
-# define RECV_BUFFER_SIZE 65536
+# define ETHERNET_MTU		1500	// Maximum Transmission Unit (ip link show)
+# define PACKET_MAX_SIZE	(ETHERNET_MTU - sizeof(struct iphdr) - sizeof(struct icmphdr))
+# define RECV_BUFFER_SIZE	65536
+# define DEFAULT_PAYLOAD	16
 
 # define NOT_EXIT			-1
 # define PROCESS			0
 # define STOP				1
-# define NOTSET				-1
+# define NOT_SET				-1
 # define SET_DEFAULT		1
 
 # define FLAG_TTL			1

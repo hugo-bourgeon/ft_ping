@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 17:52:27 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/21 14:44:53 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:08:57 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,17 +60,17 @@ void	init_flags(t_ping *ping)
 		perror("malloc");
 		free_all(EXIT_FAILURE, ping);
 	}
-	ping->flags->v = NOTSET;
-	ping->flags->f = NOTSET;
-	ping->flags->l = NOTSET;
-	ping->flags->n = NOTSET;
-	ping->flags->w = NOTSET;
+	ping->flags->v = NOT_SET;
+	ping->flags->f = NOT_SET;
+	ping->flags->l = NOT_SET;
+	ping->flags->n = NOT_SET;
+	ping->flags->w = NOT_SET;
 	ping->flags->W = 1;
 	ping->flags->p = NULL;
-	ping->flags->r = NOTSET;
+	ping->flags->r = NOT_SET;
 	ping->flags->s = 64;
-	ping->flags->T = NOTSET;
-	ping->flags->ttl = NOTSET;
+	ping->flags->T = NOT_SET;
+	ping->flags->ttl = NOT_SET;
 }
 
 
@@ -92,7 +92,7 @@ void	init_socket_dest(t_ping *ping)
 	}
 
 	// SO_DONTROUTE if -r flag is set
-	if (ping->flags->r != NOTSET)
+	if (ping->flags->r != NOT_SET)
 	{
 		int flag = 1;
 		if (setsockopt(ping->socketfd, SOL_SOCKET, SO_DONTROUTE, &flag, sizeof(flag)) < 0)
@@ -103,7 +103,7 @@ void	init_socket_dest(t_ping *ping)
 	}
 
 	// Set the TOS (Type of Service) if specified
-	if (ping->flags->T != NOTSET)
+	if (ping->flags->T != NOT_SET)
 	{
 		int tos = ping->flags->T;
 		if (setsockopt(ping->socketfd, IPPROTO_IP, IP_TOS, &tos, sizeof(tos)) < 0)
@@ -132,9 +132,10 @@ void	init_icmp_packet(t_ping *ping)
 	ping->dest_icmp->un.echo.sequence	= -1;
 	
 	// ICMP payload
-	unsigned char	*payload		= ping->packet + sizeof(struct icmphdr) + 16;
-	size_t			payload_size	= ping->flags->s - sizeof(struct icmphdr) - 16;
-	if (ping->flags->p)
+	unsigned char	*payload		= ping->packet + sizeof(struct icmphdr) + DEFAULT_PAYLOAD;
+	size_t			payload_size	= ping->flags->s - sizeof(struct icmphdr) - DEFAULT_PAYLOAD;
+	if (ping->flags->p && \
+		ping->flags->s > (long long int)(sizeof(struct icmphdr) + DEFAULT_PAYLOAD))
 		fill_pattern(payload, ping->flags->p, payload_size);
 
 	ping->dest_icmp->checksum = checksum(ping->packet, sizeof(ping->packet));

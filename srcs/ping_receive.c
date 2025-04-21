@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 15:19:38 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/21 14:44:38 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:10:06 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,8 @@ void	handle_receive(t_ping *ping)
 
 	if (bytes_received < (int)(sizeof(struct iphdr) + sizeof(struct icmphdr))) // iphdr(20) + icmphdr(8)
 	{
-		printf("%d bytes from %s: Packet too short: minimal config iphdr(20) + icmphdr(8)\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
+		if (ping->flags->f == NOT_SET)
+			printf("%d bytes from %s: Packet receive too short: minimal config iphdr(20) + icmphdr(8)\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
 		ping->stats->nb_lost++;
 		return ;
 	}
@@ -55,7 +56,7 @@ void	handle_receive(t_ping *ping)
 void	receive_packet(int *bytes_received, t_ping *ping)
 {
 	ping->addr_len = sizeof(ping->recv_addr);
-	if (ping->flags->f != NOTSET || ping->flags->l == NOTSET)
+	if (ping->flags->f != NOT_SET || ping->flags->l == NOT_SET)
 		*bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, ping->flags->s, 0, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
 	else
 		*bytes_received = recvfrom(ping->socketfd, ping->recv_buffer, ping->flags->s, MSG_DONTWAIT, (struct sockaddr *)&ping->recv_addr, &ping->addr_len);
@@ -102,7 +103,7 @@ void	handle_icmp_echo_reply(t_ping *ping, int bytes_received)
 	double	rtt	= (ping->time_now.tv_sec - ping->time_last.tv_sec) * 1000.0 + 
 				(ping->time_now.tv_usec - ping->time_last.tv_usec) / 1000.0;
 
-	if (ping->flags->f == NOTSET)
+	if (ping->flags->f == NOT_SET)
 		printf("%d bytes from %s: icmp_seq=%u ttl=%d time=%.3f ms\n", \
 		bytes_received, \
 		ping->ip, \
@@ -116,7 +117,7 @@ void	handle_icmp_echo_reply(t_ping *ping, int bytes_received)
 
 void	handle_icmp_time_exceeded(t_ping *ping, int bytes_received)
 {
-	if (ping->flags->n != NOTSET)
+	if (ping->flags->n != NOT_SET)
 		printf("%d bytes from %s: Time to live exceeded\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
 	else
 	{
@@ -130,7 +131,7 @@ void	handle_icmp_time_exceeded(t_ping *ping, int bytes_received)
 		else
 			printf("%d bytes from %s: Time to live exceeded\n", bytes_received, inet_ntoa(ping->recv_addr.sin_addr));
 	}
-	if (ping->flags->v != NOTSET) // Verbose mode
+	if (ping->flags->v != NOT_SET) // Verbose mode
 	{
 		struct iphdr	*original_ip_header = (struct iphdr *)((uint8_t *)ping->recv_icmp + sizeof(struct icmphdr));
 		struct icmphdr	*original_icmp_header = (struct icmphdr *)((uint8_t *)original_ip_header + (original_ip_header->ihl * 4));

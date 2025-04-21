@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 13:12:12 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/16 18:09:19 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:26:49 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,16 @@
 void	printf_header(t_ping *ping)
 {
 	printf("PING %s (%s): %lld data bytes", ping->host, ping->ip, ping->flags->s - 8);
-	if (ping->flags->v != NOTSET)
+	if (ping->flags->v != NOT_SET)
 		printf(", id Ox%x = %d", ping->dest_icmp->un.echo.id, ping->dest_icmp->un.echo.id);
 	printf("\n");
 }
 
 void	print_stats(t_ping *ping)
 {
-	if (ping->flags->f != NOTSET)
+	if (ping->flags->f != NOT_SET && strncmp(ping->host, "localhost", strlen(ping->host) + 1) != 0)
 	{
-		for (size_t i = 0; i < ping->stats->nb_lost; i++)
+		for (size_t i = 0; i < ping->stats->nb_lost; i += 100)
 			printf(".");
 	}
 

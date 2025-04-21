@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/16 15:17:20 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/21 14:45:27 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:08:57 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	handle_send(t_ping *ping)
 		free_all(EXIT_FAILURE, ping);
 	}
 
-	if (ping->flags->l != NOTSET)
+	if (ping->flags->l != NOT_SET)
 		ping->flags->l--;
 
 	ping->stats->nb_sent++;

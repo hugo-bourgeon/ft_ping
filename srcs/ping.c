@@ -6,7 +6,7 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 19:33:55 by hubourge          #+#    #+#             */
-/*   Updated: 2025/04/16 15:37:38 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/04/21 15:14:22 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	process(t_ping *ping)
 
 void	initialize_timeouts(t_ping *ping, struct timeval *time_limit)
 {
-	if (ping->flags->w != NOTSET)
+	if (ping->flags->w != NOT_SET)
 	{
 		gettimeofday(time_limit, NULL);
 		time_limit->tv_sec += ping->flags->w;
@@ -71,7 +71,7 @@ void	initialize_timeouts(t_ping *ping, struct timeval *time_limit)
 int	check_total_timeout(t_ping *ping, struct timeval *time_limit)
 {
 	gettimeofday(&ping->time_now, NULL);
-	if (ping->flags->w != NOTSET &&
+	if (ping->flags->w != NOT_SET &&
 		(ping->time_now.tv_sec > time_limit->tv_sec ||
 		(ping->time_now.tv_sec == time_limit->tv_sec && ping->time_now.tv_usec >= time_limit->tv_usec)))
 	{
@@ -85,7 +85,7 @@ void	set_select_timeout(t_ping *ping, struct timeval *timeout)
 	timeout->tv_sec = ping->flags->W;
 	timeout->tv_usec = 0;
 
-	if (ping->flags->f != NOTSET) // Flood mode
+	if (ping->flags->f != NOT_SET) // Flood mode
 	{
 		timeout->tv_sec = 0;
 		timeout->tv_usec = 25000;
@@ -94,7 +94,7 @@ void	set_select_timeout(t_ping *ping, struct timeval *timeout)
 
 void	adjust_remaining_timeout(t_ping *ping, struct timeval *time_limit, struct timeval *timeout)
 {
-	if (ping->flags->w != NOTSET)
+	if (ping->flags->w != NOT_SET)
 	{
 		long remaining_sec = time_limit->tv_sec - ping->time_now.tv_sec;
 		long remaining_usec = time_limit->tv_usec - ping->time_now.tv_usec;
@@ -114,7 +114,7 @@ void	adjust_remaining_timeout(t_ping *ping, struct timeval *time_limit, struct t
 
 void	reset_timeout_if_needed(t_ping *ping, struct timeval *timeout)
 {
-    if (ping->flags->f != NOTSET || ping->flags->l != NOTSET)
+    if (ping->flags->l != NOT_SET)
     {
         timeout->tv_sec = 0;
         timeout->tv_usec = 0;
