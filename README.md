@@ -12,23 +12,28 @@ sudo ./ft_ping localhost
 
 ## 📑 Introduction
 
-**Ping** is the name of a command that allows to test the accessibility of another machine
-through the IP network. The command measures also the time taken to receive a response,
-called round-trip time.
+**Ping** is the name of a command that allows testing the accessibility of another machine
+through the IP network. The command also measures the time taken to receive a response,
+called **round-trip time**.
 
 ![ft_ping demonstration](images&videos/ping_video.gif)
 
 ## 📌 Objectives  
-- Understand low-level network layers (IP & ICMP).  
-- Work with raw sockets.  
-- Build and parse network headers (IP & ICMP).  
-- Implement the core features of the ping command.  
+- Understand low-level network layers (**IP** & **ICMP**).  
+- Work with **raw sockets**.  
+- Build and parse **network headers** (IP & ICMP).  
+- Implement the core features of the **ping** command.  
 
 ## ⚙️ Features  
-- Sends ICMP Echo Requests  
-- Handles Echo Reply and Time Exceeded responses
-- Measures round-trip time (RTT)  
-- Displays packet stats: sent, received, lost, min/avg/max RTT
+- Sends **ICMP Echo Requests**  
+- Handles **Echo Reply** and **Time Exceeded** responses  
+- Measures **round-trip time (RTT)**  
+- Displays packet stats:  
+  - Sent  
+  - Received  
+  - Lost  
+  - Min/Avg/Max RTT  
+
 
 <img src="images&videos/ping_help.png" alt="subject image" width="600"/>
 
@@ -49,30 +54,30 @@ Analize network with: ```sudo tcpdump -i any icmp -X```
 
 ### IPv4 Header (20 bytes)
 
-| Offset | Hex Value   | Field                    | Description                                                      |
-|--------|-------------|--------------------------|------------------------------------------------------------------|
-| 0x00   | 45          | Version & IHL            | IPv4 and header length.                                          |
-| 0x01   | 00          | Type of Service          | Priority and routing preferences.                                |
-| 0x02   | 0054        | Total Length             | Total size of the IP packet (header + data).                     |
-| 0x04   | 3dd0        | Identification           | Identifies fragments of a datagram.                              |
-| 0x06   | 4000        | Flags & Fragment Offset  | Controls and identifies packet fragmentation.                    |
-| 0x08   | 40          | Time To Live             | Maximum number of hops before discard.                           |
-| 0x09   | 01          | Protocol                 | Protocol of the data (1 = ICMP).                                 |
-| 0x0A   | b7d6        | Header Checksum          | Error-checking for the IP header.                                |
-| 0x0C   | 0a0cf88d    | Source Address           | IP address of the sender.                                        |
-| 0x10   | 8efab36e    | Destination Address      | IP address of the receiver.                                      |
+| Offset | Hex Value   | Field                    | Description                                      |
+|--------|-------------|--------------------------|--------------------------------------------------|
+| 0x00   | 45          | Version & IHL            | IPv4 and header length.                          |
+| 0x01   | 00          | Type of Service          | Priority and routing preferences.                |
+| 0x02   | 0054        | Total Length             | Total size of the IP packet (header + data).     |
+| 0x04   | 3dd0        | Identification           | Identifies fragments of a datagram.              |
+| 0x06   | 4000        | Flags & Fragment Offset  | Controls and identifies packet fragmentation.    |
+| 0x08   | 40          | Time To Live             | Maximum number of hops before discard.           |
+| 0x09   | 01          | Protocol                 | Protocol of the data (1 = ICMP).                 |
+| 0x0A   | b7d6        | Header Checksum          | Error-checking for the IP header.                |
+| 0x0C   | 0a0cf88d    | Source Address           | IP address of the sender.                        |
+| 0x10   | 8efab36e    | Destination Address      | IP address of the receiver.                      |
 
 ---
 
 ### ICMP Header (8 bytes)
 
-| Offset | Hex Value | Field            | Description                                      |
-|--------|-----------|------------------|--------------------------------------------------|
-| 0x14   | 08        | Type             | Message type (8 = Echo Request).                 |
-| 0x15   | 00        | Code             | Subtype (0 for Echo Request).                    |
-| 0x16   | f94a      | Checksum         | Error-checking for header and payload.           |
-| 0x18   | cd09      | Identifier       | Matches requests with replies.                   |
-| 0x1A   | 0000      | Sequence Number  | Incremented with each Echo Request.  
+| Offset | Hex Value   | Field                    | Description                                      |
+|--------|-------------|--------------------------|--------------------------------------------------|
+| 0x14   | 08          | Type                     | Message type (8 = Echo Request).                 |
+| 0x15   | 00          | Code                     | Subtype (0 for Echo Request).                    |
+| 0x16   | f94a        | Checksum                 | Error-checking for header and payload.           |
+| 0x18   | cd09        | Identifier               | Matches requests with replies.                   |
+| 0x1A   | 0000        | Sequence Number          | Incremented with each Echo Request.              |
 
 ---
 
