@@ -6,14 +6,13 @@
 /*   By: hubourge <hubourge@student.42angouleme.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/11 21:43:13 by hubourge          #+#    #+#             */
-/*   Updated: 2025/05/05 14:44:56 by hubourge         ###   ########.fr       */
+/*   Updated: 2025/05/14 14:36:11 by hubourge         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ping.h"
 
 int		g_stop_code = PROCESS;
-void	print_struct(t_ping *ping);
 
 int	main(int ac, char **av)
 {
